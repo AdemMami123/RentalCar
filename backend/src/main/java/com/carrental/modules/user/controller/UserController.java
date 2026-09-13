@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -15,13 +16,13 @@ import java.util.List;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200")
+@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
     private final UserService userService;
 
     @GetMapping public ResponseEntity<ApiResponse<List<UserDTO>>> getAll() { return ResponseEntity.ok(ApiResponse.success(userService.getAllUsers(), "Users retrieved successfully")); }
     @GetMapping("/{id}") public ResponseEntity<ApiResponse<UserDTO>> getById(@PathVariable Long id) { return ResponseEntity.ok(ApiResponse.success(userService.getUserById(id), "User retrieved successfully")); }
     @GetMapping("/search/email") public ResponseEntity<ApiResponse<UserDTO>> getByEmail(@RequestParam String email) { return ResponseEntity.ok(ApiResponse.success(userService.getUserByEmail(email), "User retrieved successfully")); }
-    @PostMapping public ResponseEntity<ApiResponse<UserDTO>> create(@Valid @RequestBody UserDTO dto) { return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(userService.createUser(dto), "User created successfully")); }
     @PutMapping("/{id}") public ResponseEntity<ApiResponse<UserDTO>> update(@PathVariable Long id, @Valid @RequestBody UserDTO dto) { return ResponseEntity.ok(ApiResponse.success(userService.updateUser(id, dto), "User updated successfully")); }
     @DeleteMapping("/{id}") public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) { userService.deleteUser(id); return ResponseEntity.ok(ApiResponse.success(null, "User deleted successfully")); }
 }

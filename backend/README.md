@@ -73,7 +73,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=rentalcar
 DB_USER=car_user
-DB_PASSWORD=ademmami
+DB_PASSWORD=password
 ```
 
 ### 4. Build Project

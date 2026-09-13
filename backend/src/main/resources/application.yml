@@ -86,8 +86,6 @@ spring:
   # ============================================================
 server:
   port: 8080
-  servlet:
-    context-path: /api
   compression:
     enabled: true
   error:
@@ -117,8 +115,9 @@ logging:
 # JWT CONFIGURATION
 # ============================================================
 jwt:
-  secret: your-secret-key-change-this-in-production-very-long-secret-key-minimum-256-bits
-  expiration: 86400000  # 24 hours in milliseconds
+  secret: ${JWT_SECRET:change-this-development-secret-to-a-random-32-character-value}
+  access-token-expiration-ms: ${JWT_ACCESS_TOKEN_EXPIRATION_MS:900000}
+  refresh-token-expiration-ms: ${JWT_REFRESH_TOKEN_EXPIRATION_MS:604800000}
 
 # ============================================================
 # CORS CONFIGURATION

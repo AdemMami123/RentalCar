@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
 /**
@@ -140,6 +141,7 @@ public class LocationController {
      * @return ResponseEntity with created location
      */
     @PostMapping
+        @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<LocationDTO>> createLocation(
             @Valid @RequestBody LocationDTO locationDTO) {
         log.info("POST request to create new location: {}", locationDTO.getName());
@@ -160,6 +162,7 @@ public class LocationController {
      * @return ResponseEntity with updated location
      */
     @PutMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<LocationDTO>> updateLocation(
             @PathVariable Long id,
             @Valid @RequestBody LocationDTO locationDTO) {
@@ -179,6 +182,7 @@ public class LocationController {
      * @return ResponseEntity with success message
      */
     @DeleteMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteLocation(@PathVariable Long id) {
         log.info("DELETE request to delete location with id: {}", id);
         locationService.deleteLocation(id);
@@ -197,6 +201,7 @@ public class LocationController {
      * @return ResponseEntity with updated location
      */
     @PatchMapping("/{id}/available-cars")
+        @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<LocationDTO>> updateAvailableCars(
             @PathVariable Long id,
             @RequestParam Integer count) {

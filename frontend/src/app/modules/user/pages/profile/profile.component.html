@@ -1,0 +1,5 @@
+<main class="profile-page" *ngIf="user$ | async as user">
+  <section class="profile-hero"><p class="eyebrow">Your account</p><h1>Profile</h1><p>Keep your rental details close and your next journey even closer.</p></section>
+  <section class="profile-card"><div class="large-avatar">{{ (user.firstName || user.email).charAt(0).toUpperCase() }}</div><div><p class="label">Member</p><h2>{{ user.firstName }} {{ user.lastName }}</h2><p>{{ user.email }}</p></div></section>
+  <section class="details-grid"><article><span>First name</span><strong>{{ user.firstName || 'Not added' }}</strong></article><article><span>Last name</span><strong>{{ user.lastName || 'Not added' }}</strong></article><article><span>Account role</span><strong>{{ user.role || 'USER' }}</strong></article><article><span>Phone</span><strong>{{ user.phone || 'Not added' }}</strong></article></section>
+</main>

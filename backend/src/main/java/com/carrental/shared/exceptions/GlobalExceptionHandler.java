@@ -8,6 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -95,6 +97,21 @@ public class GlobalExceptionHandler {
                         .build()
         );
     }
+
+        @ExceptionHandler(IllegalStateException.class)
+        public ResponseEntity<ApiResponse<Object>> handleConflict(IllegalStateException ex) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(HttpStatus.CONFLICT.value(), ex.getMessage()));
+        }
+
+        @ExceptionHandler(BadCredentialsException.class)
+        public ResponseEntity<ApiResponse<Object>> handleBadCredentials() {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), "Invalid email or password"));
+        }
+
+        @ExceptionHandler(AccessDeniedException.class)
+        public ResponseEntity<ApiResponse<Object>> handleAccessDenied() {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error(HttpStatus.FORBIDDEN.value(), "Access denied"));
+        }
 
     /**
      * Handle all other exceptions

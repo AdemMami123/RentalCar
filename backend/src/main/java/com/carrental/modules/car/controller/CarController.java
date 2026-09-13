@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
 /**
@@ -210,6 +211,7 @@ public class CarController {
      * POST /api/cars
      */
     @PostMapping
+        @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<CarDTO>> createCar(
             @Valid @RequestBody CarDTO carDTO) {
         log.info("POST request to create new car: {} {}", carDTO.getMake(), carDTO.getModel());
@@ -225,6 +227,7 @@ public class CarController {
      * PUT /api/cars/{id}
      */
     @PutMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<CarDTO>> updateCar(
             @PathVariable Long id,
             @Valid @RequestBody CarDTO carDTO) {
@@ -241,6 +244,7 @@ public class CarController {
      * DELETE /api/cars/{id}
      */
     @DeleteMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteCar(@PathVariable Long id) {
         log.info("DELETE request to delete car with id: {}", id);
         carService.deleteCar(id);
@@ -255,6 +259,7 @@ public class CarController {
      * PATCH /api/cars/{id}/status?status=RENTED
      */
     @PatchMapping("/{id}/status")
+        @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<CarDTO>> updateCarStatus(
             @PathVariable Long id,
             @RequestParam String status) {
@@ -271,6 +276,7 @@ public class CarController {
      * PATCH /api/cars/{id}/mileage?mileage=50000
      */
     @PatchMapping("/{id}/mileage")
+        @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<CarDTO>> updateCarMileage(
             @PathVariable Long id,
             @RequestParam Long mileage) {

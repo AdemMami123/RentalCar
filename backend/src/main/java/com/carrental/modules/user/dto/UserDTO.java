@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 public class UserDTO {
     private Long id;
     @NotBlank @Email private String email;
-    private String password;
     private String firstName;
     private String lastName;
     private String phone;
@@ -27,6 +26,7 @@ public class UserDTO {
     private String city;
     private String country;
     private String status;
+    private String role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String createdBy;

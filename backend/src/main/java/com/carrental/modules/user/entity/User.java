@@ -6,6 +6,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -15,6 +19,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -47,6 +53,13 @@ public class User extends BaseEntity {
     @Column(nullable = false, length = 50)
     @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
+
+        @ManyToMany(fetch = FetchType.EAGER)
+        @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+        @Builder.Default
+        private Set<Role> roles = new HashSet<>();
 
     public enum UserStatus {
         ACTIVE, INACTIVE, SUSPENDED
