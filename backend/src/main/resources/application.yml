@@ -1,0 +1,153 @@
+# ============================================================
+# SPRING BOOT APPLICATION CONFIGURATION
+# ============================================================
+
+spring:
+  application:
+    name: car-rental-api
+
+  # ============================================================
+  # DATABASE CONFIGURATION
+  # ============================================================
+  datasource:
+    # Connection URL
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:rentalcar}
+    
+    username: ${DB_USER:car_user}
+    password: ${DB_PASSWORD:ademmami}
+    
+    # PostgreSQL JDBC driver
+    driver-class-name: org.postgresql.Driver
+    
+    # Connection pool settings
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # ============================================================
+  # JPA/HIBERNATE CONFIGURATION
+  # ============================================================
+  jpa:
+    # Use PostgreSQL dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    
+    # Hibernate settings
+    hibernate:
+      # validate - only validate schema, don't create/modify
+      # create - create schema, fail if exists
+      # create-drop - create schema, drop on shutdown
+      # update - update schema if needed
+      ddl-auto: validate
+    
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
+    
+    # Don't show SQL in logs
+    show-sql: false
+    
+    # Use new ID generation strategy
+    open-in-view: false
+
+  # ============================================================
+  # FLYWAY DATABASE MIGRATION
+  # ============================================================
+  flyway:
+    # Enable/disable Flyway
+    enabled: true
+    
+    # Location of migration scripts
+    locations: classpath:db/migration
+    
+    # Create schema if it doesn't exist
+    create-schemas: true
+    
+    # Table name to track migrations
+    table: flyway_schema_history
+    
+    # Allow out of order migrations
+    out-of-order: false
+    
+    # Baseline on migrate (for existing databases)
+    baseline-on-migrate: false
+
+  # ============================================================
+  # SERVER CONFIGURATION
+  # ============================================================
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+  compression:
+    enabled: true
+  error:
+    include-message: always
+    include-stacktrace: on_param
+
+# ============================================================
+# LOGGING CONFIGURATION
+# ============================================================
+logging:
+  level:
+    root: INFO
+    com.carrental: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/car-rental-api.log
+    max-size: 10MB
+    max-history: 30
+
+# ============================================================
+# JWT CONFIGURATION
+# ============================================================
+jwt:
+  secret: your-secret-key-change-this-in-production-very-long-secret-key-minimum-256-bits
+  expiration: 86400000  # 24 hours in milliseconds
+
+# ============================================================
+# CORS CONFIGURATION
+# ============================================================
+cors:
+  allowed-origins: http://localhost:4200
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
+  max-age: 3600
+
+# ============================================================
+# ACTUATOR CONFIGURATION (Health checks)
+# ============================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# ============================================================
+# JACKSON CONFIGURATION (JSON)
+# ============================================================
+jackson:
+  serialization:
+    write-dates-as-timestamps: false
+    indent-output: true
+  deserialization:
+    fail-on-unknown-properties: false
