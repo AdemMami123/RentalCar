@@ -1,0 +1,48 @@
+<main class="landing-page">
+  <section class="hero" id="top">
+    <div class="hero-image"></div>
+    <div class="hero-shade"></div>
+    <div class="hero-content page-width">
+      <p class="eyebrow light">Premium mobility, made simple</p>
+      <h1>Find the right car<br><em>for every journey.</em></h1>
+      <p class="hero-copy">Discover, compare, and rent exceptional vehicles with a simple, transparent experience built around your plans.</p>
+      <div class="hero-actions"><a class="button button-primary" routerLink="/cars">Browse cars <span>↗</span></a><a class="text-link light-link" href="#how-it-works">See how it works <span>↓</span></a></div>
+      <div class="hero-proof"><span class="proof-avatars"><i>AM</i><i>LK</i><i>+2k</i></span><span><strong>4.8/5</strong> from 2,500+ journeys</span></div>
+    </div>
+    <div class="hero-scroll">Scroll to explore <span>↓</span></div>
+  </section>
+
+  <section class="search-wrap page-width" aria-label="Search for a rental car">
+    <form class="booking-panel" (ngSubmit)="submitSearch()">
+      <div class="booking-heading"><span class="booking-label">Plan your drive</span><strong>Find a car that fits.</strong></div>
+      <label><span>Pick-up location</span><select [(ngModel)]="pickupLocation" name="pickupLocation"><option>Tunis Centre</option><option>Tunis Airport</option><option>Hammamet</option><option>Sousse</option></select></label>
+      <label><span>Pick-up date</span><input type="date" [(ngModel)]="pickupDate" name="pickupDate"></label>
+      <label><span>Return date</span><input type="date" [(ngModel)]="returnDate" name="returnDate"></label>
+      <label><span>Car category</span><select [(ngModel)]="category" name="category"><option>All categories</option><option>Economy</option><option>SUV</option><option>Luxury</option><option>Electric</option></select></label>
+      <button class="search-button" type="submit" aria-label="Search available cars">Search <span>↗</span></button>
+    </form>
+    <p class="search-message" *ngIf="searchMessage">{{ searchMessage }}</p>
+  </section>
+
+  <section class="intro-section page-width section-space">
+    <div class="section-kicker"><span>01</span><span>Selected for you</span></div>
+    <div class="section-heading-row"><div><p class="eyebrow">The fleet</p><h2>Cars with <em>character.</em></h2></div><a class="text-link" routerLink="/cars">View all vehicles <span>↗</span></a></div>
+    <div class="car-grid"><article class="car-card" *ngFor="let car of featuredCars"><div class="car-image"><img [src]="car.image" [alt]="car.brand + ' ' + car.model"><span class="car-tag">{{ car.category }}</span><button class="save-button" type="button" aria-label="Save car">♡</button></div><div class="car-info"><div class="car-title"><div><p>{{ car.brand }}</p><h3>{{ car.model }}</h3></div><span class="rating">★ {{ car.rating }}</span></div><div class="car-specs"><span>{{ car.year }}</span><span>{{ car.transmission }}</span><span>{{ car.fuel }}</span><span>{{ car.seats }} seats</span></div><div class="car-footer"><strong><b>${{ car.price }}</b> / day</strong><a routerLink="/cars" class="details-link">View details <span>↗</span></a></div></div></article></div>
+  </section>
+
+  <section class="categories-section section-space" id="categories">
+    <div class="page-width"><div class="section-kicker"><span>02</span><span>Choose your mood</span></div><div class="section-heading-row"><div><p class="eyebrow">Explore by category</p><h2>There is a car<br><em>for every story.</em></h2></div><p class="section-note">From a quick city run to a weekend away, find a vehicle that makes the miles feel like part of the plan.</p></div><div class="category-grid"><a class="category-card" *ngFor="let item of categories" routerLink="/cars"><img [src]="item.image" [alt]="item.name"><span class="category-overlay"></span><div class="category-copy"><span>{{ item.count }} vehicles</span><h3>{{ item.name }}</h3><p>{{ item.description }}</p></div><b class="category-arrow">↗</b></a></div></div>
+  </section>
+
+  <section class="price-section page-width section-space" id="pricing"><div class="section-kicker"><span>03</span><span>Clear from the start</span></div><div class="price-layout"><div><p class="eyebrow">Simple pricing</p><h2>Good cars.<br><em>Fair numbers.</em></h2><p class="body-copy">No hidden fees, no awkward surprises. Every rate includes basic cover, roadside support, and the freedom to change your plans.</p><a routerLink="/cars" class="button button-dark">Compare prices <span>↗</span></a></div><div class="price-table"><div class="price-row price-head"><span>Category</span><span>From / day</span><span>Best for</span></div><div class="price-row"><span><b class="dot economy"></b>Economy</span><strong>$32</strong><span>City breaks</span></div><div class="price-row featured-price"><span><b class="dot suv"></b>SUV</span><strong>$68</strong><span>Long weekends <i>Popular</i></span></div><div class="price-row"><span><b class="dot luxury"></b>Luxury</span><strong>$110</strong><span>Special occasions</span></div><div class="price-row"><span><b class="dot electric"></b>Electric</span><strong>$54</strong><span>Quiet explorers</span></div></div></div></section>
+
+  <section class="why-section section-space"><div class="page-width"><div class="section-kicker"><span>04</span><span>Why RentalCar</span></div><div class="why-layout"><div><p class="eyebrow">More than a rental</p><h2>Made for the<br><em>way you move.</em></h2></div><div class="benefit-grid"><article><span class="benefit-icon">✦</span><h3>Curated fleet</h3><p>Every vehicle is checked, clean, and ready for the road.</p></article><article><span class="benefit-icon">↗</span><h3>Clear pricing</h3><p>See the real total before you book. Always.</p></article><article><span class="benefit-icon">◇</span><h3>Flexible plans</h3><p>Easy changes when the journey takes a turn.</p></article><article><span class="benefit-icon">24</span><h3>Here when needed</h3><p>Human support, day or night, wherever you are.</p></article></div></div></div></section>
+
+  <section class="how-section page-width section-space" id="how-it-works"><div class="section-kicker"><span>05</span><span>Keep it moving</span></div><div class="section-heading-row"><div><p class="eyebrow">How it works</p><h2>Four steps to<br><em>open road.</em></h2></div><p class="section-note">The best journeys start before you turn the key. We make the start effortless.</p></div><div class="steps"><article><span>01</span><h3>Search</h3><p>Tell us where and when. We will show you what is ready.</p></article><article><span>02</span><h3>Choose</h3><p>Compare the details and find the car that feels right.</p></article><article><span>03</span><h3>Book</h3><p>Reserve in a few clicks with a price you can trust.</p></article><article><span>04</span><h3>Go</h3><p>Pick up, settle in, and make the road yours.</p></article></div></section>
+
+  <section class="reviews-section section-space"><div class="page-width reviews-layout"><div class="review-score"><p class="eyebrow">The good word</p><strong>4.8<span>/5</span></strong><div class="stars">★★★★★</div><p>Based on 2,500+ verified journeys</p></div><div class="review-quote"><span class="quote-mark">“</span><blockquote>Everything felt considered. The car was immaculate, the price was exactly what I expected, and I was on the road in minutes.</blockquote><div class="reviewer"><span class="review-avatar">SB</span><span><strong>Sarah Ben Ali</strong><small>Weekend in Hammamet · BMW 3 Series</small></span></div></div></div></section>
+
+  <section class="cta-section page-width"><div class="cta-inner"><p class="eyebrow light">Your next route is waiting</p><h2>Ready to hit<br><em>the road?</em></h2><p>Find a car that makes getting there part of the fun.</p><div class="hero-actions"><a class="button button-light" routerLink="/cars">Browse cars <span>↗</span></a><a class="text-link light-link" routerLink="/register">Start booking <span>↗</span></a></div></div></section>
+</main>
+
+<footer class="site-footer"><div class="page-width footer-main"><div class="footer-brand"><a class="brand-footer" routerLink="/home"><span class="brand-mark">R</span>Rental<span>Car</span></a><p>Better cars for better journeys.<br>Move beautifully.</p><span class="socials">in &nbsp; ◎ &nbsp; f &nbsp; ◉</span></div><div class="footer-column"><h4>Explore</h4><a routerLink="/cars">All vehicles</a><a href="#categories">Categories</a><a href="#pricing">Pricing</a><a href="#how-it-works">How it works</a></div><div class="footer-column"><h4>Company</h4><a href="#top">About RentalCar</a><a href="#top">Careers</a><a href="#top">Contact</a><a href="#top">Our locations</a></div><div class="footer-column"><h4>Need a hand?</h4><a href="mailto:hello&#64;rentalcar.com">hello&#64;rentalcar.com</a><a href="tel:+21670000000">+216 70 000 000</a><p>Mon–Sun · 08:00–22:00</p></div></div><div class="page-width footer-bottom"><span>© 2026 RentalCar. All rights reserved.</span><span><a href="#top">Privacy</a><a href="#top">Terms</a><a href="#top">Cookies</a></span></div></footer>

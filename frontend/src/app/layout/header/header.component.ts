@@ -13,8 +13,13 @@ import { AuthService } from '../../core/services/auth.service';
 export class HeaderComponent {
   readonly user$ = this.authService.user$;
   menuOpen = false;
+  scrolled = false;
 
   constructor(private readonly authService: AuthService) {}
+
+  @HostListener('window:scroll') updateScrollState(): void {
+    this.scrolled = window.scrollY > 24;
+  }
 
   @HostListener('window:resize') closeMenuOnDesktop(): void {
     if (window.innerWidth > 760) this.menuOpen = false;
