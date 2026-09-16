@@ -1,1 +1,82 @@
-<main class="booking-page"><section class="page-intro"><p class="eyebrow">Your journeys</p><h1>My bookings.</h1><p>Everything you have planned, in one calm place.</p></section><section class="empty-state"><span class="empty-number">No reservations yet</span><h2>Your next story starts with a car.</h2><a routerLink="/cars">Explore the fleet</a></section></main>
+<main class="booking-page">
+  <section class="page-intro">
+    <p class="eyebrow">Your journeys</p>
+    <h1>My Bookings</h1>
+    <p>Everything you have planned, in one calm place.</p>
+  </section>
+
+  <!-- Error Messages -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-spinner">
+    <p>Loading your bookings...</p>
+  </div>
+
+  <!-- Status Filters -->
+  <div *ngIf="!loading" class="filter-section">
+    <div class="filter-buttons">
+      <button
+        *ngFor="let status of bookingStatuses"
+        [ngClass]="{'active': statusFilter === status}"
+        (click)="setStatusFilter(status)"
+        class="filter-btn"
+      >
+        {{ status === 'all' ? 'All Bookings' : status }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Bookings List -->
+  <div *ngIf="!loading && bookings.length > 0" class="bookings-container">
+    <div *ngFor="let booking of bookings" class="booking-card">
+      <div class="booking-header">
+        <div class="booking-number">
+          <h3>Booking #{{ booking.bookingNumber }}</h3>
+        </div>
+        <div [ngClass]="getStatusBadgeClass(booking.bookingStatus)" class="status-badge">
+          {{ booking.bookingStatus }}
+        </div>
+      </div>
+
+      <div class="booking-details">
+        <div class="detail-item">
+          <span class="label">Pick-up Date:</span>
+          <span class="value">{{ formatDate(booking.pickupDate) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Drop-off Date:</span>
+          <span class="value">{{ formatDate(booking.dropoffDate) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Total Price:</span>
+          <span class="value price">€{{ booking.totalCost }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="booking.notes" class="booking-notes">
+        <strong>Notes:</strong> {{ booking.notes }}
+      </div>
+
+      <div class="booking-actions">
+        <a [routerLink]="['/bookings', booking.id]" class="btn btn-info">View Details</a>
+        <button
+          *ngIf="canCancelBooking(booking)"
+          (click)="cancelBooking(booking.id)"
+          class="btn btn-danger"
+        >
+          Cancel Booking
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <section *ngIf="!loading && bookings.length === 0" class="empty-state">
+    <span class="empty-number">No bookings</span>
+    <h2>Your next story starts with a car.</h2>
+    <a routerLink="/cars" class="btn btn-primary">Explore the fleet</a>
+  </section>
+</main>

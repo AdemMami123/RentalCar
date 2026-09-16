@@ -1,1 +1,29 @@
-<main class="page-shell"><section class="page-intro"><p class="eyebrow">The fleet</p><h1>Find your next ride.</h1><p>Choose a car that fits the route, the mood, and the people coming along.</p></section><section class="empty-state"><span class="empty-number">01</span><h2>Cars are ready to be connected.</h2><p>Fleet listings will appear here as they are added to the rental catalog.</p></section></main>
+<main class="page-shell">
+	<section class="page-intro">
+		<p class="eyebrow">The fleet</p>
+		<h1>Find your next ride.</h1>
+		<p>Choose a car that fits the route, the mood, and the people coming along.</p>
+	</section>
+
+	<section class="fleet-tools" aria-label="Fleet filters">
+		<input [(ngModel)]="searchTerm" (input)="applyFilters()" placeholder="Search make or model">
+		<select [(ngModel)]="selectedType" (change)="applyFilters()">
+			<option value="ALL">All types</option>
+			<option *ngFor="let type of carTypes()" [value]="type">{{ type }}</option>
+		</select>
+	</section>
+
+	<p *ngIf="loading" class="state">Loading the fleet...</p>
+	<p *ngIf="error && !loading" class="state error">{{ error }}</p>
+	<p *ngIf="!loading && !error && filteredCars.length === 0" class="state">No cars match your search.</p>
+
+	<section *ngIf="!loading && filteredCars.length" class="car-grid">
+		<article *ngFor="let car of filteredCars" class="car-card">
+			<div class="card-top"><span>{{ car.carType }}</span><span>{{ car.year }}</span></div>
+			<h2>{{ car.make }} {{ car.model }}</h2>
+			<p>{{ car.description || 'A well-kept car ready for your next journey.' }}</p>
+			<div class="card-meta"><strong>€{{ car.dailyRate | number:'1.0-2' }} / day</strong><span>{{ car.seats }} seats</span></div>
+			<a [routerLink]="['/cars', car.id]">View car <span aria-hidden="true">→</span></a>
+		</article>
+	</section>
+</main>

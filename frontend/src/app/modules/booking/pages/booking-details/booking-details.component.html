@@ -1,0 +1,114 @@
+<main class="booking-details-page">
+  <a routerLink="/bookings" class="back-link">← Back to My Bookings</a>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-spinner">
+    <p>Loading booking details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Booking Details -->
+  <div *ngIf="booking && !loading" class="booking-details-container">
+    <div class="details-header">
+      <h1>Booking {{ booking.bookingNumber }}</h1>
+      <div [ngClass]="'status-' + getStatusColorSafe(booking.bookingStatus)" class="status-badge">
+        {{ booking.bookingStatus }}
+      </div>
+    </div>
+
+    <!-- Status Timeline -->
+    <section class="status-timeline">
+      <h2>Booking Status</h2>
+      <div class="timeline">
+        <div
+          *ngFor="let step of statusSteps; let i = index"
+          [ngClass]="{'completed': isStatusCompleted(step), 'active': isStatusActive(step)}"
+          class="timeline-step"
+        >
+          <div class="step-marker">{{ i + 1 }}</div>
+          <div class="step-label">{{ step }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Booking Information -->
+    <section class="info-section">
+      <h2>Booking Information</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Booking Number:</label>
+          <span>{{ booking.bookingNumber }}</span>
+        </div>
+        <div class="info-item">
+          <label>Status:</label>
+          <span [ngClass]="'status-text-' + getStatusColorSafe(booking.bookingStatus)">
+            {{ booking.bookingStatus }}
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rental Information -->
+    <section class="info-section">
+      <h2>Rental Information</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Pick-up Date:</label>
+          <span>{{ formatDate(booking.pickupDate) }}</span>
+        </div>
+        <div class="info-item">
+          <label>Drop-off Date:</label>
+          <span>{{ formatDate(booking.dropoffDate) }}</span>
+        </div>
+        <div class="info-item">
+          <label>Pick-up Location:</label>
+          <span>Location #{{ booking.pickupLocationId }}</span>
+        </div>
+        <div class="info-item">
+          <label>Drop-off Location:</label>
+          <span>Location #{{ booking.dropoffLocationId }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Information -->
+    <section class="info-section">
+      <h2>Pricing</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Total Cost:</label>
+          <span class="price">€{{ booking.totalCost }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Notes -->
+    <section *ngIf="booking.notes" class="info-section">
+      <h2>Special Requests</h2>
+      <p class="notes">{{ booking.notes }}</p>
+    </section>
+
+    <!-- Actions -->
+    <section class="actions-section">
+      <div class="actions">
+        <button
+          *ngIf="canCancelBooking()"
+          (click)="cancelBooking()"
+          class="btn btn-danger"
+        >
+          Cancel Booking
+        </button>
+        <a routerLink="/bookings" class="btn btn-secondary">Back to List</a>
+      </div>
+    </section>
+
+    <!-- Cancelled Message -->
+    <div *ngIf="isCancelled()" class="alert alert-danger">
+      <strong>This booking has been cancelled.</strong> No further actions are available.
+    </div>
+  </div>
+</main>

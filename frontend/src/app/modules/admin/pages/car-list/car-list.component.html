@@ -1,0 +1,39 @@
+<main class="admin-cars-page">
+  <a routerLink="/admin" class="back-link">← Dashboard</a>
+  <header><p class="eyebrow">Fleet operations</p><h1>Manage cars</h1><p>Create the cars customers can browse and book.</p></header>
+
+  <div *ngIf="error" class="message error">{{ error }}</div>
+  <div *ngIf="success" class="message success">{{ success }}</div>
+
+  <section class="car-form">
+    <div class="section-heading"><h2>{{ editingCarId ? 'Edit car' : 'Add a car' }}</h2><button *ngIf="editingCarId" type="button" class="text-button" (click)="cancelEdit()">Cancel edit</button></div>
+    <form (ngSubmit)="saveCar()" #carForm="ngForm">
+      <div class="form-grid">
+        <label>Make<input name="make" [(ngModel)]="form.make" required></label>
+        <label>Model<input name="model" [(ngModel)]="form.model" required></label>
+        <label>Year<input name="year" type="number" [(ngModel)]="form.year" min="1900" max="2100" required></label>
+        <label>Daily rate<input name="dailyRate" type="number" [(ngModel)]="form.dailyRate" min="0.01" step="0.01" required></label>
+        <label>Registration number<input name="registrationNumber" [(ngModel)]="form.registrationNumber" required></label>
+        <label>License plate<input name="licensePlate" [(ngModel)]="form.licensePlate" required></label>
+        <label>VIN<input name="vin" [(ngModel)]="form.vin" minlength="10" required></label>
+        <label>Seats<input name="seats" type="number" [(ngModel)]="form.seats" min="1" max="15" required></label>
+        <label>Type<select name="carType" [(ngModel)]="form.carType" required><option *ngFor="let type of carTypes" [value]="type">{{ type }}</option></select></label>
+        <label>Transmission<select name="transmission" [(ngModel)]="form.transmission"><option *ngFor="let type of transmissions" [value]="type">{{ type }}</option></select></label>
+        <label>Fuel type<select name="fuelType" [(ngModel)]="form.fuelType"><option *ngFor="let type of fuelTypes" [value]="type">{{ type }}</option></select></label>
+        <label>Color<input name="color" [(ngModel)]="form.color"></label>
+        <label>Mileage<input name="mileage" type="number" [(ngModel)]="form.mileage" min="0"></label>
+        <label *ngIf="editingCarId">Status<select name="status" [(ngModel)]="form.status"><option *ngFor="let status of statuses" [value]="status">{{ status }}</option></select></label>
+        <label class="wide">Description<textarea name="description" [(ngModel)]="form.description" maxlength="1000" rows="3"></textarea></label>
+      </div>
+      <button class="primary-button" type="submit" [disabled]="carForm.invalid || saving">{{ saving ? 'Saving...' : (editingCarId ? 'Save changes' : 'Create car') }}</button>
+    </form>
+  </section>
+
+  <section class="car-table"><div class="section-heading"><h2>Fleet inventory</h2><button type="button" class="text-button" (click)="loadCars()">Refresh</button></div>
+    <p *ngIf="loading">Loading cars...</p>
+    <table *ngIf="!loading"><thead><tr><th>Car</th><th>Identifiers</th><th>Rate</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+      <tr *ngFor="let car of cars"><td><strong>{{ car.make }} {{ car.model }}</strong><small>{{ car.year }} · {{ car.carType }}</small></td><td><small>Reg: {{ car.registrationNumber }}</small><small>Plate: {{ car.licensePlate }}</small></td><td>€{{ car.dailyRate | number:'1.0-2' }}</td><td><select [ngModel]="car.status" (ngModelChange)="updateStatus(car, $event)"><option *ngFor="let status of statuses" [value]="status">{{ status }}</option></select></td><td class="actions"><button type="button" class="text-button" (click)="editCar(car)">Edit</button><button type="button" class="danger-button" (click)="deleteCar(car)">Delete</button></td></tr>
+    </tbody></table>
+    <p *ngIf="!loading && !cars.length">No cars have been added yet.</p>
+  </section>
+</main>

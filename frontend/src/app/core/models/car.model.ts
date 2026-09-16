@@ -7,8 +7,17 @@ export interface Car {
   model: string;
   year: number;
   registrationNumber: string;
+  licensePlate: string;
+  vin: string;
+  carType: string;
+  seats: number;
+  transmission?: string;
+  fuelType?: string;
   dailyRate: number;
-  available: boolean;
-  createdAt: string;
-  updatedAt: string;
+  status?: string;
+  color?: string;
+  mileage?: number;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }

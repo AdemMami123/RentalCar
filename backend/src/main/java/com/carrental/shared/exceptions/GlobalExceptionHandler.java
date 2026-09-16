@@ -1,5 +1,7 @@
 package com.carrental.shared.exceptions;
 
+import com.carrental.modules.booking.exception.CarNotAvailableException;
+import com.carrental.modules.booking.exception.InvalidBookingStatusTransitionException;
 import com.carrental.shared.dtos.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,48 @@ import java.util.Map;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    /**
+     * Handle CarNotAvailableException (HTTP 409 Conflict)
+     */
+    @ExceptionHandler(CarNotAvailableException.class)
+    public ResponseEntity<ApiResponse<Object>> handleCarNotAvailable(
+            CarNotAvailableException ex,
+            WebRequest request) {
+        
+        log.error("Car not available: {}", ex.getMessage());
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                ApiResponse.builder()
+                        .statusCode(HttpStatus.CONFLICT.value())
+                        .message(ex.getMessage())
+                        .data(null)
+                        .success(false)
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+    }
+
+    /**
+     * Handle InvalidBookingStatusTransitionException (HTTP 400 Bad Request)
+     */
+    @ExceptionHandler(InvalidBookingStatusTransitionException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidStatusTransition(
+            InvalidBookingStatusTransitionException ex,
+            WebRequest request) {
+        
+        log.error("Invalid booking status transition: {}", ex.getMessage());
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ApiResponse.builder()
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .message(ex.getMessage())
+                        .data(null)
+                        .success(false)
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+    }
 
     /**
      * Handle ResourceNotFoundException
@@ -98,20 +142,20 @@ public class GlobalExceptionHandler {
         );
     }
 
-        @ExceptionHandler(IllegalStateException.class)
-        public ResponseEntity<ApiResponse<Object>> handleConflict(IllegalStateException ex) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(HttpStatus.CONFLICT.value(), ex.getMessage()));
-        }
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<Object>> handleConflict(IllegalStateException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(HttpStatus.CONFLICT.value(), ex.getMessage()));
+    }
 
-        @ExceptionHandler(BadCredentialsException.class)
-        public ResponseEntity<ApiResponse<Object>> handleBadCredentials() {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), "Invalid email or password"));
-        }
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse<Object>> handleBadCredentials() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), "Invalid email or password"));
+    }
 
-        @ExceptionHandler(AccessDeniedException.class)
-        public ResponseEntity<ApiResponse<Object>> handleAccessDenied() {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error(HttpStatus.FORBIDDEN.value(), "Access denied"));
-        }
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAccessDenied() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error(HttpStatus.FORBIDDEN.value(), "Access denied"));
+    }
 
     /**
      * Handle all other exceptions

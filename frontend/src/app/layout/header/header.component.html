@@ -5,9 +5,17 @@
   <button class="menu-toggle" type="button" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
   <nav class="navigation" [class.navigation-open]="menuOpen" aria-label="Main navigation">
     <a routerLink="/cars" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Explore cars</a>
-    <a routerLink="/bookings" routerLinkActive="active" (click)="closeMenu()">My bookings</a>
     <a routerLink="/home" fragment="how-it-works" (click)="closeMenu()">How it works</a>
     <ng-container *ngIf="user$ | async as user; else guestActions">
+      <ng-container *ngIf="user.role === 'ADMIN'; else customerNavigation">
+        <span class="navigation-label">Admin</span>
+        <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Dashboard</a>
+        <a routerLink="/admin/cars" routerLinkActive="active" (click)="closeMenu()">Manage cars</a>
+        <a routerLink="/admin/bookings" routerLinkActive="active" (click)="closeMenu()">Manage bookings</a>
+      </ng-container>
+      <ng-template #customerNavigation>
+        <a routerLink="/bookings" routerLinkActive="active" (click)="closeMenu()">My bookings</a>
+      </ng-template>
       <a class="profile-link" routerLink="/profile" routerLinkActive="active" (click)="closeMenu()"><span class="avatar">{{ (user.firstName || user.email).charAt(0).toUpperCase() }}</span><span class="profile-copy"><small>Signed in as </small>{{ user.firstName || user.email }}</span></a>
       <button class="logout-button" type="button" (click)="logout()">Log out</button>
     </ng-container>

@@ -30,6 +30,12 @@ export const routes: Routes = [
       .then(m => m.BookingListComponent)
   },
   {
+    path: 'bookings/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./modules/booking/pages/booking-details/booking-details.component')
+      .then(m => m.BookingDetailsComponent)
+  },
+  {
     path: 'login',
     loadComponent: () => import('./modules/user/pages/login/login.component')
       .then(m => m.LoginComponent)
@@ -52,7 +58,19 @@ export const routes: Routes = [
       .then(m => m.AdminDashboardComponent)
   },
   {
+    path: 'admin/bookings',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () => import('./modules/admin/pages/admin-bookings/admin-bookings.component')
+      .then(m => m.AdminBookingsComponent)
+  },
+  {
+    path: 'admin/cars',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () => import('./modules/admin/pages/car-list/car-list.component')
+      .then(m => m.CarListComponent)
+  },
+  {
     path: '**',
     redirectTo: 'home'
-  }
+}
 ];

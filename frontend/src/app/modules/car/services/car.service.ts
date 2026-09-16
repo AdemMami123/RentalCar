@@ -35,4 +35,10 @@ export class CarService {
   deleteCar(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/cars/${id}`);
   }
+
+  updateCarStatus(id: number, status: string): Observable<ApiResponse<Car>> {
+    return this.http.patch<ApiResponse<Car>>(`${this.apiUrl}/cars/${id}/status`, null, {
+      params: { status }
+    });
+  }
 }

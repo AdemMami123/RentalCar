@@ -1,1 +1,68 @@
-<main class="detail-page"><a routerLink="/cars" class="back-link">Back to fleet</a><section class="detail-panel"><p class="eyebrow">Vehicle details</p><h1>Your selected car.</h1><p>Choose a vehicle from the fleet to see its full specifications and booking options.</p></section></main>
+<main class="detail-page">
+  <a routerLink="/cars" class="back-link">← Back to fleet</a>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-spinner">
+    <p>Loading car details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Success State -->
+  <div *ngIf="bookingSuccessful" class="alert alert-success">
+    Booking created successfully! Redirecting...
+  </div>
+
+  <!-- Car Details -->
+  <div *ngIf="car && !loading" class="car-details-container">
+    <section class="car-header">
+      <h1>{{ car.make }} {{ car.model }}</h1>
+      <p class="year">{{ car.year }}</p>
+    </section>
+
+    <div class="details-grid">
+      <section class="car-info">
+        <h2>Vehicle Information</h2>
+        <div class="info-group">
+          <label>Make:</label>
+          <span>{{ car.make }}</span>
+        </div>
+        <div class="info-group">
+          <label>Model:</label>
+          <span>{{ car.model }}</span>
+        </div>
+        <div class="info-group">
+          <label>Year:</label>
+          <span>{{ car.year }}</span>
+        </div>
+        <div class="info-group">
+          <label>Registration Number:</label>
+          <span>{{ car.registrationNumber }}</span>
+        </div>
+        <div class="info-group">
+          <label>Daily Rate:</label>
+          <span class="price">€{{ car.dailyRate }}/day</span>
+        </div>
+        <div class="info-group">
+          <label>Status:</label>
+          <span [ngClass]="'status-' + (car.status === 'AVAILABLE' ? 'available' : 'unavailable')">
+            {{ car.status || 'Unavailable' }}
+          </span>
+        </div>
+      </section>
+
+      <!-- Booking Form -->
+      <section class="booking-section">
+        <app-booking-form
+          [car]="car"
+          [userId]="null"
+          (bookingCreated)="onBookingCreated($event)"
+          (formSubmitted)="handleFormSubmitted()"
+        ></app-booking-form>
+      </section>
+    </div>
+  </div>
+</main>

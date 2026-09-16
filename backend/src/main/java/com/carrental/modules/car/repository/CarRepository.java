@@ -84,6 +84,8 @@ public interface CarRepository extends JpaRepository<Car, Long> {
      */
     boolean existsByRegistrationNumber(String registrationNumber);
 
+    boolean existsByLicensePlate(String licensePlate);
+
     /**
      * Check if car exists by VIN
      */

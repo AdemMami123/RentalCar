@@ -1,0 +1,137 @@
+<div class="booking-form-container">
+  <h2>Book this Vehicle</h2>
+
+  <div *ngIf="car" class="car-summary">
+    <h3>{{ car.make }} {{ car.model }} ({{ car.year }})</h3>
+    <p class="price">€{{ car.dailyRate }}/day</p>
+  </div>
+
+  <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" class="booking-form">
+    <div class="form-group">
+      <label for="pickupDate">Pick-up Date *</label>
+      <input
+        type="datetime-local"
+        id="pickupDate"
+        formControlName="pickupDate"
+        [min]="getMinDate()"
+        (change)="checkAvailability()"
+        class="form-control"
+        required
+      />
+      <div *ngIf="bookingForm.get('pickupDate')?.hasError('required')" class="error-message">
+        Pick-up date is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="dropoffDate">Drop-off Date *</label>
+      <input
+        type="datetime-local"
+        id="dropoffDate"
+        formControlName="dropoffDate"
+        [min]="getMinDate()"
+        (change)="checkAvailability()"
+        class="form-control"
+        required
+      />
+      <div *ngIf="bookingForm.get('dropoffDate')?.hasError('required')" class="error-message">
+        Drop-off date is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="pickupLocationId">Pick-up Location *</label>
+      <select
+        id="pickupLocationId"
+        formControlName="pickupLocationId"
+        class="form-control"
+        required
+      >
+        <option value="">Select pick-up location</option>
+        <option value="1">Central Office</option>
+        <option value="2">Airport Terminal</option>
+        <option value="3">Downtown Branch</option>
+      </select>
+      <div *ngIf="bookingForm.get('pickupLocationId')?.hasError('required')" class="error-message">
+        Pick-up location is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="dropoffLocationId">Drop-off Location *</label>
+      <select
+        id="dropoffLocationId"
+        formControlName="dropoffLocationId"
+        class="form-control"
+        required
+      >
+        <option value="">Select drop-off location</option>
+        <option value="1">Central Office</option>
+        <option value="2">Airport Terminal</option>
+        <option value="3">Downtown Branch</option>
+      </select>
+      <div *ngIf="bookingForm.get('dropoffLocationId')?.hasError('required')" class="error-message">
+        Drop-off location is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Special Requests</label>
+      <textarea
+        id="notes"
+        formControlName="notes"
+        class="form-control"
+        rows="3"
+        placeholder="Any special requests or requirements..."
+      ></textarea>
+    </div>
+
+    <!-- Availability Check Result -->
+    <div *ngIf="checkingAvailability" class="availability-checking">
+      <p>Checking availability...</p>
+    </div>
+
+    <div *ngIf="availabilityInfo && !checkingAvailability" class="availability-result">
+      <div [ngClass]="availabilityInfo.available ? 'available' : 'unavailable'" class="availability-status">
+        <strong>{{ availabilityInfo.available ? '✓ Available' : '✗ Not Available' }}</strong>
+      </div>
+
+      <div *ngIf="availabilityInfo.available" class="price-summary">
+        <div class="summary-item">
+          <span>Rental Duration:</span>
+          <span class="value">{{ availabilityInfo.rentalDays }} day(s)</span>
+        </div>
+        <div class="summary-item">
+          <span>Daily Rate:</span>
+          <span class="value">€{{ car?.dailyRate }}</span>
+        </div>
+        <div class="summary-item total">
+          <span>Total Price:</span>
+          <span class="value">€{{ availabilityInfo.totalCost }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Messages -->
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <!-- Success Messages -->
+    <div *ngIf="success" class="alert alert-success">
+      {{ success }}
+    </div>
+
+    <!-- Submit Button -->
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!availabilityInfo?.available || loading"
+      >
+        <span *ngIf="!loading">Book Now</span>
+        <span *ngIf="loading">Booking...</span>
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,315 @@
+<div class="admin-bookings-container">
+  <!-- Header -->
+  <div class="admin-header">
+    <h1>Booking Management</h1>
+    <p class="subtitle">Manage all customer bookings and track rental activity</p>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Statistics Dashboard -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.totalBookings }}</div>
+      <div class="stat-label">Total Bookings</div>
+    </div>
+    <div class="stat-card pending">
+      <div class="stat-value">{{ stats.pendingBookings }}</div>
+      <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat-card confirmed">
+      <div class="stat-value">{{ stats.confirmedBookings }}</div>
+      <div class="stat-label">Confirmed</div>
+    </div>
+    <div class="stat-card active">
+      <div class="stat-value">{{ stats.activeBookings }}</div>
+      <div class="stat-label">Active</div>
+    </div>
+    <div class="stat-card completed">
+      <div class="stat-value">{{ stats.completedBookings }}</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card cancelled">
+      <div class="stat-value">{{ stats.cancelledBookings }}</div>
+      <div class="stat-label">Cancelled</div>
+    </div>
+    <div class="stat-card revenue">
+      <div class="stat-value">{{ formatCurrency(stats.totalRevenue) }}</div>
+      <div class="stat-label">Total Revenue</div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filters-header">
+      <h3>Filters & Search</h3>
+      <button class="btn btn-secondary btn-sm" (click)="clearFilters()">
+        Clear All
+      </button>
+    </div>
+
+    <div class="filters-grid">
+      <!-- Status Filter -->
+      <div class="filter-group">
+        <label for="statusFilter">Status</label>
+        <select 
+          id="statusFilter" 
+          [(ngModel)]="selectedStatus" 
+          (change)="onStatusFilterChange()"
+          class="form-control"
+        >
+          <option *ngFor="let status of bookingStatusOptions" [value]="status.value">
+            {{ status.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Search -->
+      <div class="filter-group">
+        <label for="searchInput">Search (Booking # or User ID)</label>
+        <input 
+          id="searchInput" 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (input)="onSearchChange()"
+          placeholder="Enter booking number or user ID..."
+          class="form-control"
+        />
+      </div>
+
+      <!-- Car Filter -->
+      <div class="filter-group">
+        <label for="carFilter">Car</label>
+        <select 
+          id="carFilter" 
+          [(ngModel)]="selectedCarId" 
+          (change)="onCarFilterChange()"
+          class="form-control"
+        >
+          <option [value]="null">All Cars</option>
+          <option *ngFor="let car of cars | keyvalue" [value]="car.key">
+            {{ car.value.make }} {{ car.value.model }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Date Range Start -->
+      <div class="filter-group">
+        <label for="dateStart">Pickup Date From</label>
+        <input 
+          id="dateStart" 
+          type="date" 
+          [(ngModel)]="dateRangeStart" 
+          (change)="onDateRangeChange()"
+          class="form-control"
+        />
+      </div>
+
+      <!-- Date Range End -->
+      <div class="filter-group">
+        <label for="dateEnd">Pickup Date To</label>
+        <input 
+          id="dateEnd" 
+          type="date" 
+          [(ngModel)]="dateRangeEnd" 
+          (change)="onDateRangeChange()"
+          class="form-control"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions Section -->
+  <div class="actions-section">
+    <button class="btn btn-primary" (click)="refreshData()">
+      <i class="icon-refresh"></i> Refresh
+    </button>
+    <button class="btn btn-success" (click)="exportToCSV()">
+      <i class="icon-download"></i> Export to CSV
+    </button>
+  </div>
+
+  <!-- Bookings Table -->
+  <div class="bookings-table-section">
+    <div *ngIf="isLoading" class="loading">
+      <div class="spinner"></div>
+      <p>Loading bookings...</p>
+    </div>
+
+    <div *ngIf="!isLoading && paginatedBookings.length === 0" class="no-data">
+      <p>No bookings found matching your criteria.</p>
+    </div>
+
+    <div *ngIf="!isLoading && paginatedBookings.length > 0" class="table-wrapper">
+      <table class="bookings-table">
+        <thead>
+          <tr>
+            <th (click)="onSortChange('bookingNumber')" class="sortable">
+              Booking #
+              <span *ngIf="sortBy === 'bookingNumber'" class="sort-indicator">
+                {{ sortOrder === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th>User ID</th>
+            <th>Car</th>
+            <th (click)="onSortChange('pickupDate')" class="sortable">
+              Pickup Date
+              <span *ngIf="sortBy === 'pickupDate'" class="sort-indicator">
+                {{ sortOrder === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th>Dropoff Date</th>
+            <th (click)="onSortChange('totalCost')" class="sortable">
+              Total Cost
+              <span *ngIf="sortBy === 'totalCost'" class="sort-indicator">
+                {{ sortOrder === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th (click)="onSortChange('bookingStatus')" class="sortable">
+              Status
+              <span *ngIf="sortBy === 'bookingStatus'" class="sort-indicator">
+                {{ sortOrder === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let booking of paginatedBookings" class="booking-row">
+            <td class="booking-number">{{ booking.bookingNumber }}</td>
+            <td>{{ booking.userId }}</td>
+            <td class="car-info">
+              <span *ngIf="booking.carDetails">
+                {{ booking.carDetails.make }} {{ booking.carDetails.model }}
+              </span>
+              <span *ngIf="!booking.carDetails">N/A</span>
+            </td>
+            <td>{{ formatDate(booking.pickupDate) }}</td>
+            <td>{{ formatDate(booking.dropoffDate) }}</td>
+            <td class="cost">{{ formatCurrency(booking.totalCost) }}</td>
+            <td>
+              <span [ngClass]="'badge ' + getStatusClass(booking.bookingStatus!)">
+                {{ booking.bookingStatus }}
+              </span>
+            </td>
+            <td class="actions-cell">
+              <div class="action-buttons">
+                <!-- Confirm Action -->
+                <button 
+                  *ngIf="canTransition(booking).includes('CONFIRMED')"
+                  class="btn btn-sm btn-info"
+                  (click)="confirmBooking(booking.id!)"
+                  [disabled]="actionInProgress"
+                  title="Confirm this booking"
+                >
+                  Confirm
+                </button>
+
+                <!-- Activate Action -->
+                <button 
+                  *ngIf="canTransition(booking).includes('ACTIVE')"
+                  class="btn btn-sm btn-primary"
+                  (click)="activateBooking(booking.id!)"
+                  [disabled]="actionInProgress"
+                  title="Activate this booking"
+                >
+                  Activate
+                </button>
+
+                <!-- Complete Action -->
+                <button 
+                  *ngIf="canTransition(booking).includes('COMPLETED')"
+                  class="btn btn-sm btn-success"
+                  (click)="completeBooking(booking.id!)"
+                  [disabled]="actionInProgress"
+                  title="Mark as completed"
+                >
+                  Complete
+                </button>
+
+                <!-- Cancel Action -->
+                <button 
+                  *ngIf="canTransition(booking).includes('CANCELLED')"
+                  class="btn btn-sm btn-danger"
+                  (click)="cancelBooking(booking.id!)"
+                  [disabled]="actionInProgress"
+                  title="Cancel this booking"
+                >
+                  Cancel
+                </button>
+
+                <!-- View Details -->
+                <button 
+                  class="btn btn-sm btn-outline-secondary"
+                  [routerLink]="['/bookings', booking.id]"
+                  title="View booking details"
+                >
+                  View
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading && filteredBookings.length > 0" class="pagination-section">
+    <div class="pagination-info">
+      Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, filteredBookings.length) }} 
+      of {{ filteredBookings.length }} bookings
+    </div>
+
+    <div class="pagination-controls">
+      <button 
+        class="btn btn-sm"
+        (click)="changePage(1)"
+        [disabled]="currentPage === 1"
+      >
+        « First
+      </button>
+
+      <button 
+        class="btn btn-sm"
+        (click)="changePage(currentPage - 1)"
+        [disabled]="currentPage === 1"
+      >
+        ‹ Previous
+      </button>
+
+      <div class="page-numbers">
+        <button 
+          *ngFor="let page of [].constructor(totalPages); let i = index"
+          class="btn btn-sm"
+          [class.active]="currentPage === i + 1"
+          (click)="changePage(i + 1)"
+        >
+          {{ i + 1 }}
+        </button>
+      </div>
+
+      <button 
+        class="btn btn-sm"
+        (click)="changePage(currentPage + 1)"
+        [disabled]="currentPage === totalPages"
+      >
+        Next ›
+      </button>
+
+      <button 
+        class="btn btn-sm"
+        (click)="changePage(totalPages)"
+        [disabled]="currentPage === totalPages"
+      >
+        Last »
+      </button>
+    </div>
+  </div>
+</div>

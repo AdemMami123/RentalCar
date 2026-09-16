@@ -163,6 +163,12 @@ public class CarService {
             );
         }
 
+        if (carRepository.existsByLicensePlate(carDTO.getLicensePlate())) {
+            throw new IllegalArgumentException(
+                "Car with license plate '" + carDTO.getLicensePlate() + "' already exists"
+            );
+        }
+
         // Check if VIN already exists
         if (carRepository.existsByVin(carDTO.getVin())) {
             log.warn("Car with VIN {} already exists", carDTO.getVin());
@@ -196,6 +202,13 @@ public class CarService {
             log.warn("Car with registration number {} already exists", carDTO.getRegistrationNumber());
             throw new IllegalArgumentException(
                     "Car with registration number '" + carDTO.getRegistrationNumber() + "' already exists"
+            );
+        }
+
+        if (!car.getLicensePlate().equals(carDTO.getLicensePlate()) &&
+            carRepository.existsByLicensePlate(carDTO.getLicensePlate())) {
+            throw new IllegalArgumentException(
+                "Car with license plate '" + carDTO.getLicensePlate() + "' already exists"
             );
         }
 
