@@ -22,7 +22,7 @@
 			<div class="card-top"><span>{{ car.carType }}</span><span>{{ car.year }}</span></div>
 			<h2>{{ car.make }} {{ car.model }}</h2>
 			<p>{{ car.description || 'A well-kept car ready for your next journey.' }}</p>
-			<div class="card-meta"><strong>€{{ car.dailyRate | number:'1.0-2' }} / day</strong><span>{{ car.seats }} seats</span></div>
+			<div class="card-meta"><strong>€{{ car.dailyRate | number:'1.0-2' }} / day</strong><span>{{ car.fleetQuantity }} cars in fleet · {{ car.seats }} seats</span></div>
 			<a [routerLink]="['/cars', car.id]">View car <span aria-hidden="true">→</span></a>
 		</article>
 	</section>

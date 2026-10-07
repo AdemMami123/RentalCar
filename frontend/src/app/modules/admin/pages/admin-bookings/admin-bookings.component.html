@@ -92,8 +92,8 @@
           (change)="onCarFilterChange()"
           class="form-control"
         >
-          <option [value]="null">All Cars</option>
-          <option *ngFor="let car of cars | keyvalue" [value]="car.key">
+          <option [ngValue]="null">All Cars</option>
+          <option *ngFor="let car of cars | keyvalue" [ngValue]="car.key">
             {{ car.value.make }} {{ car.value.model }}
           </option>
         </select>
@@ -156,7 +156,7 @@
                 {{ sortOrder === 'asc' ? '▲' : '▼' }}
               </span>
             </th>
-            <th>User ID</th>
+            <th>Customer</th>
             <th>Car</th>
             <th (click)="onSortChange('pickupDate')" class="sortable">
               Pickup Date
@@ -183,7 +183,11 @@
         <tbody>
           <tr *ngFor="let booking of paginatedBookings" class="booking-row">
             <td class="booking-number">{{ booking.bookingNumber }}</td>
-            <td>{{ booking.userId }}</td>
+            <td class="customer-cell">
+              <strong *ngIf="booking.customer">{{ booking.customer.firstName }} {{ booking.customer.lastName }}</strong>
+              <small *ngIf="booking.customer">{{ booking.customer.email }}</small>
+              <span *ngIf="!booking.customer">User #{{ booking.userId }}</span>
+            </td>
             <td class="car-info">
               <span *ngIf="booking.carDetails">
                 {{ booking.carDetails.make }} {{ booking.carDetails.model }}

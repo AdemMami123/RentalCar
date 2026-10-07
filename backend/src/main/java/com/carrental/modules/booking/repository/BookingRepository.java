@@ -30,6 +30,17 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         @Param("dropoffDate") LocalDateTime dropoffDate
     );
 
+    @Query("SELECT b FROM Booking b WHERE b.carId = :carId " +
+           "AND b.id <> :bookingId " +
+           "AND b.bookingStatus != 'CANCELLED' " +
+           "AND ((b.pickupDate < :dropoffDate AND b.dropoffDate > :pickupDate))")
+    List<Booking> findConflictingBookingsExcludingBooking(
+        @Param("carId") Long carId,
+        @Param("pickupDate") LocalDateTime pickupDate,
+        @Param("dropoffDate") LocalDateTime dropoffDate,
+        @Param("bookingId") Long bookingId
+    );
+
     /**
      * Find bookings by user and status
      */

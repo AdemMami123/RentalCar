@@ -52,6 +52,7 @@ export class AuthService {
   getRefreshToken(): string | null { return sessionStorage.getItem(this.refreshTokenKey); }
   isAuthenticated(): boolean { return !!this.getAccessToken(); }
   isAdmin(): boolean { return this.userSubject.value?.role === 'ADMIN'; }
+  getCurrentUser(): User | null { return this.userSubject.value; }
 
   clearAuthentication(): void {
     sessionStorage.removeItem(this.accessTokenKey);

@@ -2,7 +2,8 @@ import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BookingService } from '../../services/booking.service';
-import { Booking, BookingAvailabilityResponse } from '../../../../core/models/booking.model';
+import { AuthService } from '../../../../core/services/auth.service';
+import { Booking, BookingAvailabilityResponse, BookingDateRangeSuggestion } from '../../../../core/models/booking.model';
 import { Car } from '../../../../core/models/car.model';
 
 /**
@@ -31,7 +32,8 @@ export class BookingFormComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private bookingService: BookingService
+    private bookingService: BookingService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -110,12 +112,12 @@ export class BookingFormComponent implements OnInit {
 
     const booking: Booking = {
       carId: this.car.id,
+      userId: this.userId ?? this.authService.getCurrentUser()?.id,
       pickupDate: this.bookingForm.get('pickupDate')?.value,
       dropoffDate: this.bookingForm.get('dropoffDate')?.value,
-      pickupLocationId: this.bookingForm.get('pickupLocationId')?.value,
-      dropoffLocationId: this.bookingForm.get('dropoffLocationId')?.value,
-      notes: this.bookingForm.get('notes')?.value,
-      bookingNumber: ''
+      pickupLocationId: Number(this.bookingForm.get('pickupLocationId')?.value),
+      dropoffLocationId: Number(this.bookingForm.get('dropoffLocationId')?.value),
+      notes: this.bookingForm.get('notes')?.value || ''
     };
 
     this.bookingService.createBooking(booking).subscribe({
@@ -132,6 +134,14 @@ export class BookingFormComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  selectSuggestedDates(suggestion: BookingDateRangeSuggestion): void {
+    this.bookingForm.patchValue({
+      pickupDate: suggestion.pickupDate.slice(0, 16),
+      dropoffDate: suggestion.dropoffDate.slice(0, 16)
+    });
+    this.checkAvailability();
   }
 
   /**

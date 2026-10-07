@@ -98,6 +98,9 @@ public class CarDTO {
     @Positive(message = "Daily rate must be greater than 0")
     private Double dailyRate;
 
+    @Positive(message = "Fleet quantity must be greater than 0")
+    private Integer fleetQuantity;
+
     /**
      * Current status
      */

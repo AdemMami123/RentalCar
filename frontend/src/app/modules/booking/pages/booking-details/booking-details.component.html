@@ -52,6 +52,18 @@
       </div>
     </section>
 
+    <section *ngIf="booking.customer" class="info-section customer-section">
+      <h2>Customer Profile</h2>
+      <div class="info-grid">
+        <div class="info-item"><label>Name:</label><span>{{ booking.customer.firstName }} {{ booking.customer.lastName }}</span></div>
+        <div class="info-item"><label>Email:</label><span>{{ booking.customer.email }}</span></div>
+        <div class="info-item"><label>Phone:</label><span>{{ booking.customer.phone || 'Not provided' }}</span></div>
+        <div class="info-item"><label>License:</label><span>{{ booking.customer.licenseNumber || 'Not provided' }}</span></div>
+        <div class="info-item"><label>License expiry:</label><span>{{ booking.customer.licenseExpiry || 'Not provided' }}</span></div>
+        <div class="info-item"><label>Address:</label><span>{{ booking.customer.address || 'Not provided' }}<ng-container *ngIf="booking.customer.city || booking.customer.country">, {{ booking.customer.city }} {{ booking.customer.country }}</ng-container></span></div>
+      </div>
+    </section>
+
     <!-- Rental Information -->
     <section class="info-section">
       <h2>Rental Information</h2>

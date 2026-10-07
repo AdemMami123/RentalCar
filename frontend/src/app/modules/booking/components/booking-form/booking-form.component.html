@@ -93,7 +93,15 @@
 
     <div *ngIf="availabilityInfo && !checkingAvailability" class="availability-result">
       <div [ngClass]="availabilityInfo.available ? 'available' : 'unavailable'" class="availability-status">
-        <strong>{{ availabilityInfo.available ? '✓ Available' : '✗ Not Available' }}</strong>
+        <strong>{{ availabilityInfo.available ? '✓ Available' : '✗ No cars available' }}</strong>
+        <span>{{ availabilityInfo.availableCarCount }} of {{ availabilityInfo.totalCarCount }} cars available for these dates.</span>
+      </div>
+
+      <div *ngIf="!availabilityInfo.available && availabilityInfo.suggestedDateRanges?.length" class="date-suggestions">
+        <strong>Try these available dates:</strong>
+        <button type="button" *ngFor="let suggestion of availabilityInfo.suggestedDateRanges" (click)="selectSuggestedDates(suggestion)">
+          {{ suggestion.pickupDate | date:'mediumDate' }} - {{ suggestion.dropoffDate | date:'mediumDate' }}
+        </button>
       </div>
 
       <div *ngIf="availabilityInfo.available" class="price-summary">

@@ -1,6 +1,7 @@
 package com.carrental.modules.booking.service;
 
 import com.carrental.modules.booking.dto.BookingDTO;
+import com.carrental.modules.booking.dto.BookingCustomerDTO;
 import com.carrental.modules.booking.entity.Booking;
 import com.carrental.modules.booking.exception.CarNotAvailableException;
 import com.carrental.modules.booking.exception.InvalidBookingStatusTransitionException;
@@ -8,6 +9,8 @@ import com.carrental.modules.booking.mapper.BookingMapper;
 import com.carrental.modules.booking.repository.BookingRepository;
 import com.carrental.modules.car.entity.Car;
 import com.carrental.modules.car.repository.CarRepository;
+import com.carrental.modules.user.entity.User;
+import com.carrental.modules.user.repository.UserRepository;
 import com.carrental.shared.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service for managing car rental bookings with comprehensive business logic
@@ -30,13 +36,14 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final CarRepository carRepository;
+    private final UserRepository userRepository;
 
     /**
      * Get all bookings (admin only)
      */
     public List<BookingDTO> getAllBookings() {
         return bookingRepository.findAll().stream()
-                .map(bookingMapper::toDTO)
+            .map(this::toDTOWithCustomer)
                 .toList();
     }
 
@@ -44,7 +51,7 @@ public class BookingService {
      * Get booking by ID
      */
     public BookingDTO getBookingById(Long id) {
-        return bookingMapper.toDTO(
+        return toDTOWithCustomer(
                 bookingRepository.findById(id)
                         .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + id))
         );
@@ -55,7 +62,7 @@ public class BookingService {
      */
     public List<BookingDTO> getBookingsByUser(Long userId) {
         return bookingRepository.findByUserId(userId).stream()
-                .map(bookingMapper::toDTO)
+            .map(this::toDTOWithCustomer)
                 .toList();
     }
 
@@ -65,7 +72,7 @@ public class BookingService {
     public List<BookingDTO> getBookingsByUserAndStatus(Long userId, String status) {
         Booking.BookingStatus bookingStatus = Booking.BookingStatus.valueOf(status.toUpperCase());
         return bookingRepository.findByUserIdAndBookingStatus(userId, bookingStatus).stream()
-                .map(bookingMapper::toDTO)
+            .map(this::toDTOWithCustomer)
                 .toList();
     }
 
@@ -74,7 +81,7 @@ public class BookingService {
      */
     public List<BookingDTO> getBookingsByCar(Long carId) {
         return bookingRepository.findByCarId(carId).stream()
-                .map(bookingMapper::toDTO)
+            .map(this::toDTOWithCustomer)
                 .toList();
     }
 
@@ -84,7 +91,7 @@ public class BookingService {
     public List<BookingDTO> getBookingsByStatus(String status) {
         Booking.BookingStatus bookingStatus = Booking.BookingStatus.valueOf(status.toUpperCase());
         return bookingRepository.findByBookingStatus(bookingStatus).stream()
-                .map(bookingMapper::toDTO)
+            .map(this::toDTOWithCustomer)
                 .toList();
     }
 
@@ -92,10 +99,48 @@ public class BookingService {
      * Check if a car is available for the requested date range
      */
     public boolean isCarAvailable(Long carId, LocalDateTime pickupDate, LocalDateTime dropoffDate) {
-        List<Booking> conflictingBookings = bookingRepository.findConflictingBookings(
-                carId, pickupDate, dropoffDate
-        );
-        return conflictingBookings.isEmpty();
+        return getAvailableCarCount(carId, pickupDate, dropoffDate) > 0;
+    }
+
+    public int getTotalCarCount(Long carId) {
+        Car car = carRepository.findById(carId)
+                .orElseThrow(() -> new ResourceNotFoundException("Car not found with id: " + carId));
+        return "AVAILABLE".equals(car.getStatus().name()) ? car.getFleetQuantity() : 0;
+    }
+
+    public int getAvailableCarCount(Long carId, LocalDateTime pickupDate, LocalDateTime dropoffDate) {
+        int totalCarCount = getTotalCarCount(carId);
+        int bookedCarCount = bookingRepository.findConflictingBookings(carId, pickupDate, dropoffDate).size();
+        return Math.max(totalCarCount - bookedCarCount, 0);
+    }
+
+    public List<Map<String, String>> findAvailableDateSuggestions(
+            Long carId, LocalDateTime pickupDate, LocalDateTime dropoffDate) {
+        long rentalDays = Math.max(calculateRentalDays(pickupDate, dropoffDate), 1);
+        List<Map<String, String>> suggestions = new ArrayList<>();
+
+        for (int offset = 1; offset <= 90 && suggestions.size() < 5; offset++) {
+            LocalDateTime suggestedPickup = pickupDate.plusDays(offset);
+            LocalDateTime suggestedDropoff = suggestedPickup.plusDays(rentalDays);
+            if (getAvailableCarCount(carId, suggestedPickup, suggestedDropoff) > 0) {
+                Map<String, String> suggestion = new LinkedHashMap<>();
+                suggestion.put("pickupDate", suggestedPickup.toString());
+                suggestion.put("dropoffDate", suggestedDropoff.toString());
+                suggestions.add(suggestion);
+            }
+        }
+
+        return suggestions;
+    }
+
+    public boolean isCarAvailableExcludingBooking(Long carId, LocalDateTime pickupDate,
+                                                   LocalDateTime dropoffDate, Long bookingId) {
+        Car car = carRepository.findById(carId)
+            .orElseThrow(() -> new ResourceNotFoundException("Car not found with id: " + carId));
+        int bookedCarCount = bookingRepository.findConflictingBookingsExcludingBooking(
+            carId, pickupDate, dropoffDate, bookingId
+        ).size();
+        return "AVAILABLE".equals(car.getStatus().name()) && bookedCarCount < car.getFleetQuantity();
     }
 
     /**
@@ -164,7 +209,7 @@ public class BookingService {
         Booking savedBooking = bookingRepository.save(booking);
 
         log.info("Booking created successfully with ID: {}", savedBooking.getId());
-        return bookingMapper.toDTO(savedBooking);
+        return toDTOWithCustomer(savedBooking);
     }
 
     /**
@@ -183,7 +228,7 @@ public class BookingService {
         }
 
         // Re-check availability to ensure car is still available
-        if (!isCarAvailable(booking.getCarId(), booking.getPickupDate(), booking.getDropoffDate())) {
+        if (!isCarAvailableExcludingBooking(booking.getCarId(), booking.getPickupDate(), booking.getDropoffDate(), booking.getId())) {
             throw new CarNotAvailableException(
                     "This vehicle is no longer available for the selected dates."
             );
@@ -193,7 +238,7 @@ public class BookingService {
         Booking updatedBooking = bookingRepository.save(booking);
 
         log.info("Booking confirmed successfully");
-        return bookingMapper.toDTO(updatedBooking);
+        return toDTOWithCustomer(updatedBooking);
     }
 
     /**
@@ -215,7 +260,7 @@ public class BookingService {
         Booking updatedBooking = bookingRepository.save(booking);
 
         log.info("Booking activated successfully");
-        return bookingMapper.toDTO(updatedBooking);
+        return toDTOWithCustomer(updatedBooking);
     }
 
     /**
@@ -237,7 +282,7 @@ public class BookingService {
         Booking updatedBooking = bookingRepository.save(booking);
 
         log.info("Booking completed successfully");
-        return bookingMapper.toDTO(updatedBooking);
+        return toDTOWithCustomer(updatedBooking);
     }
 
     /**
@@ -260,7 +305,7 @@ public class BookingService {
         Booking updatedBooking = bookingRepository.save(booking);
 
         log.info("Booking cancelled successfully");
-        return bookingMapper.toDTO(updatedBooking);
+        return toDTOWithCustomer(updatedBooking);
     }
 
     /**
@@ -286,7 +331,7 @@ public class BookingService {
             }
 
             // Check availability for new dates
-            if (!isCarAvailable(booking.getCarId(), dto.getPickupDate(), dto.getDropoffDate())) {
+            if (!isCarAvailableExcludingBooking(booking.getCarId(), dto.getPickupDate(), dto.getDropoffDate(), booking.getId())) {
                 throw new CarNotAvailableException(
                         "This vehicle is no longer available for the selected dates."
                 );
@@ -316,7 +361,7 @@ public class BookingService {
 
         Booking updatedBooking = bookingRepository.save(booking);
         log.info("Booking updated successfully");
-        return bookingMapper.toDTO(updatedBooking);
+        return toDTOWithCustomer(updatedBooking);
     }
 
     /**
@@ -369,5 +414,35 @@ public class BookingService {
             bookingRepository.save(booking);
             log.info("Auto-completed booking ID: {}", booking.getId());
         }
+    }
+
+    public boolean isOwner(Long bookingId, String username) {
+        try {
+            Long userId = Long.valueOf(username);
+            return bookingRepository.findById(bookingId)
+                    .map(booking -> booking.getUserId().equals(userId))
+                    .orElse(false);
+        } catch (NumberFormatException exception) {
+            return false;
+        }
+    }
+
+    private BookingDTO toDTOWithCustomer(Booking booking) {
+        BookingDTO dto = bookingMapper.toDTO(booking);
+        userRepository.findById(booking.getUserId()).ifPresent(user ->
+                dto.setCustomer(BookingCustomerDTO.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .phone(user.getPhone())
+                        .licenseNumber(user.getLicenseNumber())
+                        .licenseExpiry(user.getLicenseExpiry())
+                        .address(user.getAddress())
+                        .city(user.getCity())
+                        .country(user.getCountry())
+                        .build())
+        );
+        return dto;
     }
 }

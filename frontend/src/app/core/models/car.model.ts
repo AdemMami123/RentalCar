@@ -14,6 +14,7 @@ export interface Car {
   transmission?: string;
   fuelType?: string;
   dailyRate: number;
+  fleetQuantity: number;
   status?: string;
   color?: string;
   mileage?: number;

@@ -154,6 +154,9 @@ public class CarService {
     @Transactional
     public CarDTO createCar(CarDTO carDTO) {
         log.info("Creating new car: {} {}", carDTO.getMake(), carDTO.getModel());
+        if (carDTO.getFleetQuantity() == null) {
+            carDTO.setFleetQuantity(1);
+        }
 
         // Check if registration number already exists
         if (carRepository.existsByRegistrationNumber(carDTO.getRegistrationNumber())) {

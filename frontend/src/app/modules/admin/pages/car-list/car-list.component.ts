@@ -82,6 +82,6 @@ export class CarListComponent implements OnInit {
 	}
 
 	private emptyCar(): Car {
-		return { make: '', model: '', year: new Date().getFullYear(), registrationNumber: '', licensePlate: '', vin: '', carType: 'SEDAN', seats: 5, transmission: 'AUTOMATIC', fuelType: 'PETROL', dailyRate: 0, status: 'AVAILABLE', mileage: 0, color: '', description: '' } as Car;
+		return { make: '', model: '', year: new Date().getFullYear(), registrationNumber: '', licensePlate: '', vin: '', carType: 'SEDAN', seats: 5, transmission: 'AUTOMATIC', fuelType: 'PETROL', dailyRate: 0, fleetQuantity: 1, status: 'AVAILABLE', mileage: 0, color: '', description: '' } as Car;
 	}
 }

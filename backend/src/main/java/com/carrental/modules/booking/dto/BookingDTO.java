@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 public class BookingDTO {
     private Long id;
     private String bookingNumber;
-    @NotNull private Long userId;
+    private Long userId;
+    private BookingCustomerDTO customer;
     @NotNull private Long carId;
     @NotNull private Long pickupLocationId;
     @NotNull private Long dropoffLocationId;

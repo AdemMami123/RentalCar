@@ -103,6 +103,12 @@ public class Car extends BaseEntity {
     @Column(nullable = false, precision = 10, scale = 2)
     @Positive(message = "Daily rate must be greater than zero")
     private BigDecimal dailyRate;
+
+    @Column(nullable = false)
+    @Positive(message = "Fleet quantity must be greater than zero")
+    @Builder.Default
+    private Integer fleetQuantity = 1;
+
     /**
      * Current status of the car (AVAILABLE, RENTED, MAINTENANCE, RETIRED)
      */

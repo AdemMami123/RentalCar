@@ -10,6 +10,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface BookingMapper {
     @Mapping(target = "bookingStatus", expression = "java(booking.getBookingStatus() != null ? booking.getBookingStatus().toString() : null)")
+    @Mapping(target = "customer", ignore = true)
     BookingDTO toDTO(Booking booking);
     @Mapping(target = "bookingStatus", expression = "java(dto.getBookingStatus() != null ? Booking.BookingStatus.valueOf(dto.getBookingStatus().toUpperCase()) : Booking.BookingStatus.PENDING)")
     Booking toEntity(BookingDTO dto);

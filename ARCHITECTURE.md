@@ -60,13 +60,15 @@ frontend/
 - List available cars
 - Car details and specifications
 - Car maintenance tracking
-- Inventory management
+- Inventory management with `fleetQuantity` per car model/fleet record
 
 **2. Booking Module**
 - Create/update bookings
 - Booking status management
 - Booking history
 - Cancellation logic
+- Date-aware capacity checks against overlapping bookings
+- Alternative date suggestions when all fleet units are reserved
 
 **3. Payment Module**
 - Payment processing
@@ -92,12 +94,15 @@ frontend/
 - Car details page
 - Search and filter
 - Car availability calendar
+- Fleet totals shown to customers
 
 **2. Booking Module**
 - Booking form
 - Booking confirmation
 - Booking history
 - Booking management
+- Selected-date total and available car counts
+- Suggested available date ranges when no units remain
 
 **3. Payment Module**
 - Payment form
