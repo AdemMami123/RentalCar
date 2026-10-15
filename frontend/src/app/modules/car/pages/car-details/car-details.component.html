@@ -25,9 +25,6 @@
 
     <div class="details-grid">
       <section class="car-info">
-        <div *ngIf="car.imageUrls?.length" class="car-gallery">
-          <img *ngFor="let imageUrl of car.imageUrls" [src]="imageUrl" [alt]="car.make + ' ' + car.model">
-        </div>
         <h2>Vehicle Information</h2>
         <div class="info-group">
           <label>Make:</label>
@@ -54,6 +51,9 @@
           <span [ngClass]="'status-' + (car.status === 'AVAILABLE' ? 'available' : 'unavailable')">
             {{ car.status || 'Unavailable' }}
           </span>
+        </div>
+        <div *ngIf="car.imageUrls?.length" class="car-gallery" aria-label="Vehicle images">
+          <img *ngFor="let imageUrl of car.imageUrls" [src]="imageUrl" [alt]="car.make + ' ' + car.model">
         </div>
       </section>
 
