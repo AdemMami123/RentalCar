@@ -25,6 +25,7 @@ public class UserDTO {
     private String address;
     private String city;
     private String country;
+    private String profileImageUrl;
     private String status;
     private String role;
     private LocalDateTime createdAt;

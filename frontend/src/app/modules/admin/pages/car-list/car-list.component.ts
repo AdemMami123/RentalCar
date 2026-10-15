@@ -20,6 +20,7 @@ export class CarListComponent implements OnInit {
 	error = '';
 	success = '';
 	form: Car = this.emptyCar();
+	selectedImages: File[] = [];
 
 	readonly carTypes = ['SEDAN', 'SUV', 'VAN', 'TRUCK', 'COUPE', 'HATCHBACK'];
 	readonly transmissions = ['MANUAL', 'AUTOMATIC', 'CVT'];
@@ -42,19 +43,30 @@ export class CarListComponent implements OnInit {
 		this.error = '';
 		this.success = '';
 		this.saving = true;
+		if (!this.editingCarId && this.selectedImages.length === 0) {
+			this.error = 'Select at least one car image.';
+			this.saving = false;
+			return;
+		}
 		const request = this.editingCarId
 			? this.carService.updateCar(this.editingCarId, this.form)
-			: this.carService.createCar(this.form);
+			: this.carService.createCarWithImages(this.form, this.selectedImages);
 		request.subscribe({
 			next: () => {
 				this.success = this.editingCarId ? 'Car updated successfully.' : 'Car created successfully.';
 				this.form = this.emptyCar();
 				this.editingCarId = null;
+				this.selectedImages = [];
 				this.saving = false;
 				this.loadCars();
 			},
 			error: error => { this.error = error.error?.message || 'Unable to save car.'; this.saving = false; }
 		});
+	}
+
+	onImagesSelected(event: Event): void {
+		const input = event.target as HTMLInputElement;
+		this.selectedImages = Array.from(input.files || []);
 	}
 
 	editCar(car: Car): void {
@@ -63,7 +75,7 @@ export class CarListComponent implements OnInit {
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 
-	cancelEdit(): void { this.editingCarId = null; this.form = this.emptyCar(); }
+	cancelEdit(): void { this.editingCarId = null; this.form = this.emptyCar(); this.selectedImages = []; }
 
 	deleteCar(car: Car): void {
 		if (!car.id || !confirm(`Delete ${car.make} ${car.model}?`)) return;

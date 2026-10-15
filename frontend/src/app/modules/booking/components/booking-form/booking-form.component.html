@@ -48,9 +48,9 @@
         required
       >
         <option value="">Select pick-up location</option>
-        <option value="1">Central Office</option>
-        <option value="2">Airport Terminal</option>
-        <option value="3">Downtown Branch</option>
+        <option *ngFor="let location of locations" [value]="location.id">
+          {{ location.name }}
+        </option>
       </select>
       <div *ngIf="bookingForm.get('pickupLocationId')?.hasError('required')" class="error-message">
         Pick-up location is required
@@ -66,9 +66,9 @@
         required
       >
         <option value="">Select drop-off location</option>
-        <option value="1">Central Office</option>
-        <option value="2">Airport Terminal</option>
-        <option value="3">Downtown Branch</option>
+        <option *ngFor="let location of locations" [value]="location.id">
+          {{ location.name }}
+        </option>
       </select>
       <div *ngIf="bookingForm.get('dropoffLocationId')?.hasError('required')" class="error-message">
         Drop-off location is required

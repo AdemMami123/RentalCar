@@ -13,6 +13,107 @@
   }
 }
 
+@media (min-width: 769px) {
+  .booking-form-container {
+    max-width: none;
+    margin: 0;
+    padding: 1rem;
+
+    h2 {
+      margin-bottom: 0.65rem;
+      font-size: 1.25rem;
+    }
+  }
+
+  .car-summary {
+    padding: 0.65rem 0.8rem;
+    margin-bottom: 0.75rem;
+
+    h3 {
+      font-size: 0.95rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .price {
+      font-size: 1rem;
+    }
+  }
+
+  .booking-form {
+    padding: 0.85rem;
+
+    .form-group {
+      margin-bottom: 0.55rem;
+
+      label {
+        margin-bottom: 0.2rem;
+        font-size: 0.82rem;
+      }
+
+      .form-control {
+        padding: 0.42rem 0.55rem;
+        font-size: 0.86rem;
+      }
+
+      textarea.form-control {
+        height: 46px;
+      }
+    }
+
+    .form-group:nth-child(1),
+    .form-group:nth-child(2),
+    .form-group:nth-child(3),
+    .form-group:nth-child(4) {
+      display: inline-block;
+      vertical-align: top;
+      width: calc(50% - 0.35rem);
+    }
+
+    .form-group:nth-child(odd) {
+      margin-right: 0.5rem;
+    }
+  }
+
+  .availability-result {
+    margin-bottom: 0.65rem;
+    padding: 0.65rem;
+
+    .availability-status {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.55rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.82rem;
+    }
+
+    .price-summary {
+      padding: 0.55rem;
+
+      .summary-item {
+        padding: 0.2rem 0;
+        font-size: 0.82rem;
+      }
+    }
+  }
+
+  .availability-checking,
+  .alert {
+    padding: 0.55rem;
+    margin-bottom: 0.55rem;
+    font-size: 0.82rem;
+  }
+
+  .form-actions {
+    margin-top: 0.75rem;
+
+    .btn {
+      padding: 0.55rem 1rem;
+      font-size: 0.88rem;
+    }
+  }
+}
+
 .car-summary {
   background: white;
   padding: 1rem;

@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS car_images (
+    id BIGSERIAL PRIMARY KEY,
+    car_id BIGINT NOT NULL REFERENCES cars(id) ON DELETE CASCADE,
+    url VARCHAR(1000) NOT NULL,
+    public_id VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    updated_by VARCHAR(100),
+    version BIGINT DEFAULT 1
+);
+
+CREATE INDEX IF NOT EXISTS idx_car_images_car_id ON car_images(car_id);
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_image_url VARCHAR(1000);

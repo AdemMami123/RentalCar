@@ -39,6 +39,17 @@ export class AuthService {
     );
   }
 
+  uploadProfileImage(image: File): Observable<ApiResponse<User>> {
+    const formData = new FormData();
+    formData.append('image', image, image.name);
+    return this.http.post<ApiResponse<User>>(`${environment.apiUrl}/profile/image`, formData).pipe(
+      tap(response => {
+        sessionStorage.setItem('rentalcar_user', JSON.stringify(response.data));
+        this.userSubject.next(response.data);
+      })
+    );
+  }
+
   logout(): void {
     const refreshToken = this.getRefreshToken();
     if (refreshToken) {

@@ -19,6 +19,7 @@
 
 	<section *ngIf="!loading && filteredCars.length" class="car-grid">
 		<article *ngFor="let car of filteredCars" class="car-card">
+			<img *ngIf="car.imageUrls?.[0]" [src]="car.imageUrls?.[0]" [alt]="car.make + ' ' + car.model">
 			<div class="card-top"><span>{{ car.carType }}</span><span>{{ car.year }}</span></div>
 			<h2>{{ car.make }} {{ car.model }}</h2>
 			<p>{{ car.description || 'A well-kept car ready for your next journey.' }}</p>

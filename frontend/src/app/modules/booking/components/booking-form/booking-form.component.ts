@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BookingService } from '../../services/booking.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { LocationService } from '../../../../core/services/location.service';
 import { Booking, BookingAvailabilityResponse, BookingDateRangeSuggestion } from '../../../../core/models/booking.model';
 import { Car } from '../../../../core/models/car.model';
+import { Location } from '../../../../core/models/location.model';
 
 /**
  * Booking Form Component
@@ -29,15 +31,18 @@ export class BookingFormComponent implements OnInit {
   success: string | null = null;
   availabilityInfo: BookingAvailabilityResponse | null = null;
   checkingAvailability = false;
+  locations: Location[] = [];
 
   constructor(
     private fb: FormBuilder,
     private bookingService: BookingService,
-    private authService: AuthService
+    private authService: AuthService,
+    private locationService: LocationService
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
+    this.loadLocations();
   }
 
   initializeForm(): void {
@@ -47,6 +52,17 @@ export class BookingFormComponent implements OnInit {
       pickupLocationId: ['', [Validators.required]],
       dropoffLocationId: ['', [Validators.required]],
       notes: ['']
+    });
+  }
+
+  private loadLocations(): void {
+    this.locationService.getLocations().subscribe({
+      next: (response) => {
+        this.locations = response.data;
+      },
+      error: () => {
+        this.error = 'Unable to load pick-up and drop-off locations';
+      }
     });
   }
 

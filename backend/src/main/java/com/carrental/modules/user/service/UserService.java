@@ -8,6 +8,8 @@ import com.carrental.shared.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import com.carrental.shared.services.CloudinaryMediaService;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final CloudinaryMediaService mediaService;
 
     public List<UserDTO> getAllUsers() { return userRepository.findAll().stream().map(userMapper::toDTO).toList(); }
     public UserDTO getUserById(Long id) { return userMapper.toDTO(userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id))); }
@@ -33,6 +36,15 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         if (!user.getEmail().equals(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail())) throw new IllegalArgumentException("User with email '" + dto.getEmail() + "' already exists");
         userMapper.updateEntityFromDTO(dto, user);
+        return userMapper.toDTO(userRepository.save(user));
+    }
+
+    @Transactional
+    public UserDTO updateProfileImage(Long id, MultipartFile image) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        CloudinaryMediaService.UploadedMedia uploaded = mediaService.uploadImage(image, "rentalcar/profiles/" + id);
+        user.setProfileImageUrl(uploaded.url());
         return userMapper.toDTO(userRepository.save(user));
     }
 

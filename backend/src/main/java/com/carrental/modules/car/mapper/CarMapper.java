@@ -24,6 +24,7 @@ public interface CarMapper {
     @Mapping(target = "transmission", expression = "java(car.getTransmission() != null ? car.getTransmission().toString() : null)")
     @Mapping(target = "fuelType", expression = "java(car.getFuelType() != null ? car.getFuelType().toString() : null)")
     @Mapping(target = "status", expression = "java(car.getStatus() != null ? car.getStatus().toString() : null)")
+    @Mapping(target = "imageUrls", ignore = true)
     CarDTO toDTO(Car car);
 
     /**

@@ -28,6 +28,13 @@ export class CarService {
     return this.http.post<ApiResponse<Car>>(`${this.apiUrl}/cars`, car);
   }
 
+  createCarWithImages(car: Car, images: File[]): Observable<ApiResponse<Car>> {
+    const formData = new FormData();
+    formData.append('car', new Blob([JSON.stringify(car)], { type: 'application/json' }));
+    images.forEach(image => formData.append('images', image, image.name));
+    return this.http.post<ApiResponse<Car>>(`${this.apiUrl}/cars/with-images`, formData);
+  }
+
   updateCar(id: number, car: Car): Observable<ApiResponse<Car>> {
     return this.http.put<ApiResponse<Car>>(`${this.apiUrl}/cars/${id}`, car);
   }

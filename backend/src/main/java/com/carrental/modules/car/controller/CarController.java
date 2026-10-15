@@ -7,11 +7,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * REST Controller for Car endpoints.
@@ -220,6 +222,17 @@ public class CarController {
                 ApiResponse.success(createdCar, "Car created successfully")
         );
     }
+
+        @PostMapping(value = "/with-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        @PreAuthorize("hasRole('ADMIN')")
+        public ResponseEntity<ApiResponse<CarDTO>> createCarWithImages(
+                        @Valid @RequestPart("car") CarDTO carDTO,
+                        @RequestPart("images") List<MultipartFile> images) {
+                CarDTO createdCar = carService.createCarWithImages(carDTO, images);
+                return ResponseEntity.status(HttpStatus.CREATED).body(
+                                ApiResponse.success(createdCar, "Car created successfully")
+                );
+        }
 
     /**
      * Update car

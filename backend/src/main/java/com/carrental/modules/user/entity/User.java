@@ -49,6 +49,9 @@ public class User extends BaseEntity {
     private String city;
     private String country;
 
+    @Column(length = 1000)
+    private String profileImageUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
     @Builder.Default

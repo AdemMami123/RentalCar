@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Data Transfer Object for Car.
@@ -97,6 +98,8 @@ public class CarDTO {
     @NotNull(message = "Daily rate is required")
     @Positive(message = "Daily rate must be greater than 0")
     private Double dailyRate;
+
+    private List<String> imageUrls;
 
     @Positive(message = "Fleet quantity must be greater than 0")
     private Integer fleetQuantity;

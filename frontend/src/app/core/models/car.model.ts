@@ -15,6 +15,7 @@ export interface Car {
   fuelType?: string;
   dailyRate: number;
   fleetQuantity: number;
+  imageUrls?: string[];
   status?: string;
   color?: string;
   mileage?: number;

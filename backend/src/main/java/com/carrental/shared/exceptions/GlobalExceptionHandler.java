@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.access.AccessDeniedException;
@@ -145,6 +146,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ApiResponse<Object>> handleConflict(IllegalStateException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(HttpStatus.CONFLICT.value(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(MediaUploadException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMediaUpload(MediaUploadException ex) {
+        log.error("Media upload failed: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(
+                ApiResponse.error(HttpStatus.BAD_GATEWAY.value(), ex.getMessage())
+        );
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMaxUploadSizeExceeded() {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(
+                ApiResponse.error(HttpStatus.PAYLOAD_TOO_LARGE.value(), "Each image must be 10 MB or smaller and the total upload must be 50 MB or smaller")
+        );
     }
 
     @ExceptionHandler(BadCredentialsException.class)

@@ -8,6 +8,7 @@ export interface User {
   phone?: string;
   firstName: string;
   lastName: string;
+  profileImageUrl?: string;
   licenseNumber: string;
   licenseExpiry: string;
   createdAt: string;

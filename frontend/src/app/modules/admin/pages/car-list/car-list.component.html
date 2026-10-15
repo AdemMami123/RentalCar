@@ -14,6 +14,7 @@
         <label>Year<input name="year" type="number" [(ngModel)]="form.year" min="1900" max="2100" required></label>
         <label>Daily rate<input name="dailyRate" type="number" [(ngModel)]="form.dailyRate" min="0.01" step="0.01" required></label>
         <label>Total cars<input name="fleetQuantity" type="number" [(ngModel)]="form.fleetQuantity" min="1" step="1" required></label>
+        <label class="wide">Car images <span>(at least one required for a new car)</span><input name="images" type="file" accept="image/*" multiple [required]="!editingCarId" (change)="onImagesSelected($event)"></label>
         <label>Registration number<input name="registrationNumber" [(ngModel)]="form.registrationNumber" required></label>
         <label>License plate<input name="licensePlate" [(ngModel)]="form.licensePlate" required></label>
         <label>VIN<input name="vin" [(ngModel)]="form.vin" minlength="10" required></label>

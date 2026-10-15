@@ -2,9 +2,12 @@ package com.carrental.modules.car.service;
 
 import com.carrental.modules.car.dto.CarDTO;
 import com.carrental.modules.car.entity.Car;
+import com.carrental.modules.car.entity.CarImage;
 import com.carrental.modules.car.mapper.CarMapper;
+import com.carrental.modules.car.repository.CarImageRepository;
 import com.carrental.modules.car.repository.CarRepository;
 import com.carrental.shared.exceptions.ResourceNotFoundException;
+import com.carrental.shared.services.CloudinaryMediaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Service class for Car business logic.
@@ -26,6 +30,8 @@ public class CarService {
 
     private final CarRepository carRepository;
     private final CarMapper carMapper;
+    private final CarImageRepository carImageRepository;
+    private final CloudinaryMediaService mediaService;
 
     /**
      * Get all cars
@@ -34,7 +40,7 @@ public class CarService {
         log.debug("Fetching all cars");
         return carRepository.findAll()
                 .stream()
-                .map(carMapper::toDTO)
+                .map(this::toDTOWithImages)
                 .collect(Collectors.toList());
     }
 
@@ -47,7 +53,7 @@ public class CarService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Car not found with id: " + id
                 ));
-        return carMapper.toDTO(car);
+        return toDTOWithImages(car);
     }
 
     /**
@@ -187,6 +193,24 @@ public class CarService {
         return carMapper.toDTO(savedCar);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public CarDTO createCarWithImages(CarDTO carDTO, List<MultipartFile> images) {
+        if (images == null || images.stream().noneMatch(file -> file != null && !file.isEmpty())) {
+            throw new IllegalArgumentException("At least one car image is required");
+        }
+
+        CarDTO created = createCar(carDTO);
+        Car car = carRepository.findById(created.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Created car could not be loaded"));
+        carRepository.flush();
+        for (MultipartFile image : images) {
+            if (image == null || image.isEmpty()) continue;
+            CloudinaryMediaService.UploadedMedia uploaded = mediaService.uploadImage(image, "rentalcar/cars/" + car.getId());
+            carImageRepository.save(CarImage.builder().car(car).url(uploaded.url()).publicId(uploaded.publicId()).build());
+        }
+        return toDTOWithImages(car);
+    }
+
     /**
      * Update existing car
      */
@@ -245,6 +269,14 @@ public class CarService {
 
         carRepository.delete(car);
         log.info("Car deleted successfully");
+    }
+
+    private CarDTO toDTOWithImages(Car car) {
+        CarDTO dto = carMapper.toDTO(car);
+        dto.setImageUrls(carImageRepository.findByCarIdOrderByCreatedAtAsc(car.getId()).stream()
+                .map(CarImage::getUrl)
+                .toList());
+        return dto;
     }
 
     /**
