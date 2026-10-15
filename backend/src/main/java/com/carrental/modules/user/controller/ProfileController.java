@@ -57,4 +57,12 @@ public class ProfileController {
         return ResponseEntity.ok(ApiResponse.success(
                 documentService.list(Long.valueOf(authentication.getName())), "Documents retrieved successfully"));
     }
+
+    @GetMapping("/documents/{id}/preview")
+    public ResponseEntity<ApiResponse<String>> previewDocument(
+            @PathVariable Long id, Authentication authentication) {
+        return ResponseEntity.ok(ApiResponse.success(
+                documentService.previewUrl(Long.valueOf(authentication.getName()), id),
+                "Temporary document preview URL created"));
+    }
 }

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +46,14 @@ public class IdentityDocumentService {
     public List<IdentityDocumentDTO> list(Long userId) {
         if (!userRepository.existsById(userId)) throw new ResourceNotFoundException("User not found");
         return documentRepository.findByUserIdOrderByCreatedAtDesc(userId).stream().map(this::toDTO).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public String previewUrl(Long userId, Long documentId) {
+        IdentityDocument document = documentRepository.findById(documentId)
+                .filter(item -> Objects.equals(item.getUser().getId(), userId))
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+        return mediaService.createPrivateDocumentUrl(document.getPublicId(), document.getContentType());
     }
 
     private void validate(MultipartFile file) {

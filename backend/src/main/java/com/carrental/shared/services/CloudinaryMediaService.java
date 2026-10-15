@@ -61,6 +61,7 @@ public class CloudinaryMediaService {
         if (cloudName.isBlank() || apiKey.isBlank() || apiSecret.isBlank()) {
             throw new IllegalStateException("Cloudinary is not configured");
         }
+
         try {
             Map<?, ?> result = cloudinary.uploader().upload(
                     file.getBytes(),
@@ -75,6 +76,20 @@ public class CloudinaryMediaService {
         } catch (IOException | RuntimeException exception) {
             throw new MediaUploadException("The identity document could not be stored securely.", exception);
         }
+    }
+
+    public String createPrivateDocumentUrl(String publicId, String contentType) {
+        if (cloudName.isBlank() || apiKey.isBlank() || apiSecret.isBlank()) {
+            throw new IllegalStateException("Cloudinary is not configured");
+        }
+        String resourceType = contentType != null && contentType.equalsIgnoreCase("application/pdf")
+                ? "raw" : "image";
+        return cloudinary.url()
+                .secure(true)
+                .signed(true)
+                .type("authenticated")
+                .resourceType(resourceType)
+                .generate(publicId);
     }
 
     public record UploadedMedia(String url, String publicId) {}

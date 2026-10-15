@@ -70,6 +70,10 @@ export class AuthService {
     return this.http.get<ApiResponse<IdentityDocument[]>>(`${environment.apiUrl}/profile/documents`);
   }
 
+  getIdentityDocumentPreview(id: number): Observable<ApiResponse<string>> {
+    return this.http.get<ApiResponse<string>>(`${environment.apiUrl}/profile/documents/${id}/preview`);
+  }
+
   logout(): void {
     const refreshToken = this.getRefreshToken();
     if (refreshToken) {
