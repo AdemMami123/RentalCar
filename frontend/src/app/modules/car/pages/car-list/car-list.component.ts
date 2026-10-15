@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CarService } from '../../services/car.service';
 import { Car } from '../../../../core/models/car.model';
 
@@ -20,9 +20,13 @@ export class CarListComponent implements OnInit {
 	loading = true;
 	error = '';
 
-	constructor(private carService: CarService) {}
+	constructor(private carService: CarService, private route: ActivatedRoute) {}
 
 	ngOnInit(): void {
+		this.route.queryParamMap.subscribe(params => {
+			this.selectedType = params.get('type')?.toUpperCase() || 'ALL';
+			this.applyFilters();
+		});
 		this.carService.getAllCars().subscribe({
 			next: response => {
 				this.cars = response.data || [];

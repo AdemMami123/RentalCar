@@ -1,27 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-
-interface FeaturedCar {
-  brand: string;
-  model: string;
-  year: number;
-  category: string;
-  transmission: string;
-  fuel: string;
-  seats: number;
-  rating: number;
-  price: number;
-  image: string;
-  accent: string;
-}
+import { Router, RouterLink } from '@angular/router';
+import { CarService } from '../../../car/services/car.service';
+import { Car } from '../../../../core/models/car.model';
 
 interface Category {
+  type: string;
   name: string;
   description: string;
   count: number;
-  image: string;
+  image?: string;
 }
 
 @Component({
@@ -31,27 +20,61 @@ interface Category {
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   pickupLocation = 'Tunis Centre';
   pickupDate = '';
   returnDate = '';
   category = 'All categories';
   searchMessage = '';
+  cars: Car[] = [];
+  featuredCars: Car[] = [];
+  categories: Category[] = [];
+  loading = true;
+  error = '';
 
-  readonly featuredCars: FeaturedCar[] = [
-    { brand: 'BMW', model: 'M4 Competition', year: 2024, category: 'Sports', transmission: 'Automatic', fuel: 'Petrol', seats: 4, rating: 4.9, price: 145, image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1000&q=85', accent: 'performance' },
-    { brand: 'Mercedes-Benz', model: 'E-Class Sedan', year: 2024, category: 'Luxury', transmission: 'Automatic', fuel: 'Hybrid', seats: 5, rating: 4.8, price: 118, image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=1000&q=85', accent: 'executive' },
-    { brand: 'Audi', model: 'Q5 S line', year: 2023, category: 'SUV', transmission: 'Automatic', fuel: 'Petrol', seats: 5, rating: 4.7, price: 96, image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1000&q=85', accent: 'adventure' }
-  ];
+  constructor(private carService: CarService, private router: Router) {}
 
-  readonly categories: Category[] = [
-    { name: 'Economy', description: 'Smart city travel', count: 24, image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=700&q=80' },
-    { name: 'SUV', description: 'Room for every route', count: 18, image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=700&q=80' },
-    { name: 'Luxury', description: 'Arrive in distinction', count: 12, image: 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=700&q=80' },
-    { name: 'Electric', description: 'Quietly go further', count: 9, image: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=700&q=80' }
-  ];
+  ngOnInit(): void {
+    this.carService.getAllCars().subscribe({
+      next: response => {
+        this.cars = response.data || [];
+        this.featuredCars = this.cars.slice(0, 3);
+        this.categories = this.buildCategories(this.cars);
+        this.loading = false;
+      },
+      error: error => {
+        this.error = error.error?.message || 'Unable to load the fleet.';
+        this.loading = false;
+      }
+    });
+  }
+
+  private buildCategories(cars: Car[]): Category[] {
+    const grouped = new Map<string, Car[]>();
+    cars.forEach(car => {
+      if (!car.carType) return;
+      const type = car.carType.toUpperCase();
+      grouped.set(type, [...(grouped.get(type) || []), car]);
+    });
+
+    return [...grouped.entries()].map(([type, carsInCategory]) => ({
+      type,
+      name: this.displayType(type),
+      description: `${this.displayType(type)} cars for your next journey`,
+      count: carsInCategory.length,
+      image: carsInCategory.find(car => car.imageUrls?.[0])?.imageUrls?.[0]
+    }));
+  }
+
+  private displayType(type: string): string {
+    return type.charAt(0) + type.slice(1).toLowerCase();
+  }
 
   submitSearch(): void {
+    if (this.category !== 'All categories') {
+      this.router.navigate(['/cars'], { queryParams: { type: this.category } });
+      return;
+    }
     this.searchMessage = this.pickupDate && this.returnDate ? `Showing cars near ${this.pickupLocation} for your dates.` : 'Choose both dates to see the best available cars.';
   }
 }
