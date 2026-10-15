@@ -1,9 +1,9 @@
 <main class="detail-page">
-  <a routerLink="/cars" class="back-link">← Back to fleet</a>
+  <a routerLink="/cars" class="back-link">← {{ 'car.back' | translate }}</a>
 
   <!-- Loading State -->
   <div *ngIf="loading" class="loading-spinner">
-    <p>Loading car details...</p>
+    <p>{{ 'car.loading' | translate }}</p>
   </div>
 
   <!-- Error State -->
@@ -21,37 +21,37 @@
     <section class="car-header">
       <h1>{{ car.make }} {{ car.model }}</h1>
       <p class="year">{{ car.year }}</p>
-      <button type="button" (click)="toggleFavorite()">{{ favorite ? 'Remove from favorites' : 'Save to favorites' }}</button>
+      <button type="button" (click)="toggleFavorite()">{{ (favorite ? 'car.removeFavorite' : 'car.favorite') | translate }}</button>
       <p *ngIf="favoriteError" class="alert alert-danger">{{ favoriteError }}</p>
     </section>
 
     <div class="details-grid">
       <section class="car-info">
-        <h2>Vehicle Information</h2>
+        <h2>{{ 'car.vehicleInfo' | translate }}</h2>
         <div class="info-group">
-          <label>Make:</label>
+          <label>{{ 'car.make' | translate }}</label>
           <span>{{ car.make }}</span>
         </div>
         <div class="info-group">
-          <label>Model:</label>
+          <label>{{ 'car.model' | translate }}</label>
           <span>{{ car.model }}</span>
         </div>
         <div class="info-group">
-          <label>Year:</label>
+          <label>{{ 'car.year' | translate }}</label>
           <span>{{ car.year }}</span>
         </div>
         <div class="info-group">
-          <label>Registration Number:</label>
+          <label>{{ 'car.registration' | translate }}</label>
           <span>{{ car.registrationNumber }}</span>
         </div>
         <div class="info-group">
-          <label>Daily Rate:</label>
+          <label>{{ 'car.dailyRate' | translate }}</label>
           <span class="price">€{{ car.dailyRate }}/day</span>
         </div>
         <div class="info-group">
-          <label>Status:</label>
+          <label>{{ 'car.status' | translate }}</label>
           <span [ngClass]="'status-' + (car.status === 'AVAILABLE' ? 'available' : 'unavailable')">
-            {{ car.status || 'Unavailable' }}
+            {{ ('status.' + (car.status || 'UNAVAILABLE')) | translate }}
           </span>
         </div>
         <div *ngIf="car.imageUrls?.length" class="car-gallery" aria-label="Vehicle images">

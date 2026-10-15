@@ -7,6 +7,7 @@ import { LocationService } from '../../../../core/services/location.service';
 import { Booking, BookingAvailabilityResponse, BookingDateRangeSuggestion } from '../../../../core/models/booking.model';
 import { Car } from '../../../../core/models/car.model';
 import { Location } from '../../../../core/models/location.model';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 /**
  * Booking Form Component
@@ -15,7 +16,7 @@ import { Location } from '../../../../core/models/location.model';
 @Component({
   selector: 'app-booking-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './booking-form.component.html',
   styleUrl: './booking-form.component.scss'
 })

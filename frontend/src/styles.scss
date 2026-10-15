@@ -1,3 +1,5 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; min-height: 100%; }
 body { background: #eef2f0; }
+html[dir='rtl'] body { direction: rtl; text-align: right; }
+html[dir='rtl'] input, html[dir='rtl'] select, html[dir='rtl'] textarea { text-align: right; }

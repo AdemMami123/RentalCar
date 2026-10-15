@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CarService } from '../../services/car.service';
 import { Car } from '../../../../core/models/car.model';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'app-car-list',
 	standalone: true,
-	imports: [CommonModule, FormsModule, RouterLink],
+	imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
 	templateUrl: './car-list.component.html',
 	styleUrl: './car-list.component.scss'
 })

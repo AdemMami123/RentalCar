@@ -1,30 +1,30 @@
 <main class="page-shell">
 	<section class="page-intro">
-		<p class="eyebrow">The fleet</p>
-		<h1>Find your next ride.</h1>
-		<p>Choose a car that fits the route, the mood, and the people coming along.</p>
+		<p class="eyebrow">{{ 'fleet.eyebrow' | translate }}</p>
+		<h1>{{ 'fleet.title' | translate }}</h1>
+		<p>{{ 'fleet.subtitle' | translate }}</p>
 	</section>
 
-	<section class="fleet-tools" aria-label="Fleet filters">
-		<input [(ngModel)]="searchTerm" (input)="applyFilters()" placeholder="Search make or model">
+	<section class="fleet-tools" [attr.aria-label]="'fleet.filters' | translate">
+		<input [(ngModel)]="searchTerm" (input)="applyFilters()" [placeholder]="'fleet.search' | translate">
 		<select [(ngModel)]="selectedType" (change)="applyFilters()">
-			<option value="ALL">All types</option>
+			<option value="ALL">{{ 'fleet.allTypes' | translate }}</option>
 			<option *ngFor="let type of carTypes()" [value]="type">{{ type }}</option>
 		</select>
 	</section>
 
-	<p *ngIf="loading" class="state">Loading the fleet...</p>
+	<p *ngIf="loading" class="state">{{ 'fleet.loading' | translate }}</p>
 	<p *ngIf="error && !loading" class="state error">{{ error }}</p>
-	<p *ngIf="!loading && !error && filteredCars.length === 0" class="state">No cars match your search.</p>
+	<p *ngIf="!loading && !error && filteredCars.length === 0" class="state">{{ 'fleet.noMatch' | translate }}</p>
 
 	<section *ngIf="!loading && filteredCars.length" class="car-grid">
 		<article *ngFor="let car of filteredCars" class="car-card">
 			<img *ngIf="car.imageUrls?.[0]" [src]="car.imageUrls?.[0]" [alt]="car.make + ' ' + car.model">
-			<div class="card-top"><span>{{ car.carType }}</span><span>{{ car.year }}</span></div>
+			<div class="card-top"><span>{{ ('carType.' + car.carType) | translate }}</span><span>{{ car.year }}</span></div>
 			<h2>{{ car.make }} {{ car.model }}</h2>
-			<p>{{ car.description || 'A well-kept car ready for your next journey.' }}</p>
-			<div class="card-meta"><strong>€{{ car.dailyRate | number:'1.0-2' }} / day</strong><span>{{ car.fleetQuantity }} cars in fleet · {{ car.seats }} seats</span></div>
-			<a [routerLink]="['/cars', car.id]">View car <span aria-hidden="true">→</span></a>
+			<p>{{ car.description || ('fleet.defaultDescription' | translate) }}</p>
+			<div class="card-meta"><strong>€{{ car.dailyRate | number:'1.0-2' }} / day</strong><span>{{ car.fleetQuantity }} {{ 'fleet.carsInFleet' | translate }} · {{ car.seats }} {{ 'fleet.seats' | translate }}</span></div>
+			<a [routerLink]="['/cars', car.id]">{{ 'fleet.viewCar' | translate }} <span aria-hidden="true">→</span></a>
 		</article>
 	</section>
 </main>

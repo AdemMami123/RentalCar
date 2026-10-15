@@ -6,11 +6,12 @@ import { BookingFormComponent } from '../../../booking/components/booking-form/b
 import { Car } from '../../../../core/models/car.model';
 import { Booking } from '../../../../core/models/booking.model';
 import { AuthService } from '../../../../core/services/auth.service';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-car-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, BookingFormComponent],
+  imports: [CommonModule, RouterLink, BookingFormComponent, TranslatePipe],
   templateUrl: './car-details.component.html',
   styleUrl: './car-details.component.scss'
 })

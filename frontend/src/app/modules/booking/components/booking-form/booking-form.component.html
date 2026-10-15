@@ -1,5 +1,5 @@
 <div class="booking-form-container">
-  <h2>Book this Vehicle</h2>
+  <h2>{{ 'booking.title' | translate }}</h2>
 
   <div *ngIf="car" class="car-summary">
     <h3>{{ car.make }} {{ car.model }} ({{ car.year }})</h3>
@@ -8,7 +8,7 @@
 
   <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" class="booking-form">
     <div class="form-group">
-      <label for="pickupDate">Pick-up Date *</label>
+      <label for="pickupDate">{{ 'booking.pickupDate' | translate }}</label>
       <input
         type="datetime-local"
         id="pickupDate"
@@ -19,12 +19,12 @@
         required
       />
       <div *ngIf="bookingForm.get('pickupDate')?.hasError('required')" class="error-message">
-        Pick-up date is required
+        {{ 'booking.required' | translate }}
       </div>
     </div>
 
     <div class="form-group">
-      <label for="dropoffDate">Drop-off Date *</label>
+      <label for="dropoffDate">{{ 'booking.dropoffDate' | translate }}</label>
       <input
         type="datetime-local"
         id="dropoffDate"
@@ -35,70 +35,70 @@
         required
       />
       <div *ngIf="bookingForm.get('dropoffDate')?.hasError('required')" class="error-message">
-        Drop-off date is required
+        {{ 'booking.required' | translate }}
       </div>
     </div>
 
     <div class="form-group">
-      <label for="pickupLocationId">Pick-up Location *</label>
+      <label for="pickupLocationId">{{ 'booking.pickupLocation' | translate }}</label>
       <select
         id="pickupLocationId"
         formControlName="pickupLocationId"
         class="form-control"
         required
       >
-        <option value="">Select pick-up location</option>
+        <option value="">{{ 'booking.selectPickup' | translate }}</option>
         <option *ngFor="let location of locations" [value]="location.id">
           {{ location.name }}
         </option>
       </select>
       <div *ngIf="bookingForm.get('pickupLocationId')?.hasError('required')" class="error-message">
-        Pick-up location is required
+        {{ 'booking.required' | translate }}
       </div>
     </div>
 
     <div class="form-group">
-      <label for="dropoffLocationId">Drop-off Location *</label>
+      <label for="dropoffLocationId">{{ 'booking.dropoffLocation' | translate }}</label>
       <select
         id="dropoffLocationId"
         formControlName="dropoffLocationId"
         class="form-control"
         required
       >
-        <option value="">Select drop-off location</option>
+        <option value="">{{ 'booking.selectDropoff' | translate }}</option>
         <option *ngFor="let location of locations" [value]="location.id">
           {{ location.name }}
         </option>
       </select>
       <div *ngIf="bookingForm.get('dropoffLocationId')?.hasError('required')" class="error-message">
-        Drop-off location is required
+        {{ 'booking.required' | translate }}
       </div>
     </div>
 
     <div class="form-group">
-      <label for="notes">Special Requests</label>
+      <label for="notes">{{ 'booking.specialRequests' | translate }}</label>
       <textarea
         id="notes"
         formControlName="notes"
         class="form-control"
         rows="3"
-        placeholder="Any special requests or requirements..."
+        [placeholder]="'booking.placeholder' | translate"
       ></textarea>
     </div>
 
     <!-- Availability Check Result -->
     <div *ngIf="checkingAvailability" class="availability-checking">
-      <p>Checking availability...</p>
+      <p>{{ 'booking.checking' | translate }}</p>
     </div>
 
     <div *ngIf="availabilityInfo && !checkingAvailability" class="availability-result">
       <div [ngClass]="availabilityInfo.available ? 'available' : 'unavailable'" class="availability-status">
-        <strong>{{ availabilityInfo.available ? '✓ Available' : '✗ No cars available' }}</strong>
-        <span>{{ availabilityInfo.availableCarCount }} of {{ availabilityInfo.totalCarCount }} cars available for these dates.</span>
+        <strong>{{ (availabilityInfo.available ? 'booking.available' : 'booking.noneAvailable') | translate }}</strong>
+        <span>{{ availabilityInfo.availableCarCount }} / {{ availabilityInfo.totalCarCount }} {{ 'booking.availableForDates' | translate }}</span>
       </div>
 
       <div *ngIf="!availabilityInfo.available && availabilityInfo.suggestedDateRanges?.length" class="date-suggestions">
-        <strong>Try these available dates:</strong>
+        <strong>{{ 'booking.tryDates' | translate }}</strong>
         <button type="button" *ngFor="let suggestion of availabilityInfo.suggestedDateRanges" (click)="selectSuggestedDates(suggestion)">
           {{ suggestion.pickupDate | date:'mediumDate' }} - {{ suggestion.dropoffDate | date:'mediumDate' }}
         </button>
@@ -106,15 +106,15 @@
 
       <div *ngIf="availabilityInfo.available" class="price-summary">
         <div class="summary-item">
-          <span>Rental Duration:</span>
-          <span class="value">{{ availabilityInfo.rentalDays }} day(s)</span>
+          <span>{{ 'booking.duration' | translate }}</span>
+          <span class="value">{{ availabilityInfo.rentalDays }} {{ 'booking.day' | translate }}</span>
         </div>
         <div class="summary-item">
-          <span>Daily Rate:</span>
+          <span>{{ 'car.dailyRate' | translate }}</span>
           <span class="value">€{{ car?.dailyRate }}</span>
         </div>
         <div class="summary-item total">
-          <span>Total Price:</span>
+          <span>{{ 'booking.total' | translate }}</span>
           <span class="value">€{{ availabilityInfo.totalCost }}</span>
         </div>
       </div>
@@ -137,8 +137,8 @@
         class="btn btn-primary"
         [disabled]="!availabilityInfo?.available || loading"
       >
-        <span *ngIf="!loading">Book Now</span>
-        <span *ngIf="loading">Booking...</span>
+        <span *ngIf="!loading">{{ 'booking.bookNow' | translate }}</span>
+        <span *ngIf="loading">{{ 'booking.booking' | translate }}</span>
       </button>
     </div>
   </form>
