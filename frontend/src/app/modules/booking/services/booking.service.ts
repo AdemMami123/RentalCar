@@ -34,8 +34,14 @@ export class BookingService {
    * Get all bookings for current user
    */
   getMyBookings(): Observable<ApiResponse<Booking[]>> {
-    // This would need the userId from auth service
-    return this.http.get<ApiResponse<Booking[]>>(`${this.apiUrl}/user/current`);
+    return this.http.get<ApiResponse<Booking[]>>(`${this.apiUrl}/mine`);
+  }
+
+  /**
+   * Get bookings with a status for the authenticated user
+   */
+  getMyBookingsByStatus(status: string): Observable<ApiResponse<Booking[]>> {
+    return this.http.get<ApiResponse<Booking[]>>(`${this.apiUrl}/mine/status/${status}`);
   }
 
   /**

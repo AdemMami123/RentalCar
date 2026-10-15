@@ -4,7 +4,6 @@ import { RouterLink } from '@angular/router';
 import { BookingService } from '../../services/booking.service';
 import { Booking } from '../../../../core/models/booking.model';
 import { AuthService } from '../../../../core/services/auth.service';
-import { User } from '../../../../core/models/user.model';
 
 /**
  * Booking List Component - for clients to view their bookings
@@ -21,7 +20,6 @@ export class BookingListComponent implements OnInit {
   loading = true;
   error: string | null = null;
   statusFilter: string = 'all';
-  currentUser: User | null = null;
 
   bookingStatuses = ['all', 'PENDING', 'CONFIRMED', 'ACTIVE', 'COMPLETED', 'CANCELLED'];
 
@@ -33,25 +31,18 @@ export class BookingListComponent implements OnInit {
   ngOnInit(): void {
     // Subscribe to the current user
     this.authService.user$.subscribe((user) => {
-      this.currentUser = user;
-      if (user?.id) {
+      if (user) {
         this.loadBookings();
       }
     });
   }
 
   loadBookings(): void {
-    if (!this.currentUser?.id) {
-      this.error = 'User information not available';
-      this.loading = false;
-      return;
-    }
-
     this.loading = true;
     this.error = null;
 
     if (this.statusFilter === 'all') {
-      this.bookingService.getBookingsByUserId(this.currentUser.id).subscribe({
+      this.bookingService.getMyBookings().subscribe({
         next: (response) => {
           this.bookings = response.data;
           this.loading = false;
@@ -62,7 +53,7 @@ export class BookingListComponent implements OnInit {
         }
       });
     } else {
-      this.bookingService.getBookingsByUserIdAndStatus(this.currentUser.id, this.statusFilter).subscribe({
+      this.bookingService.getMyBookingsByStatus(this.statusFilter).subscribe({
         next: (response) => {
           this.bookings = response.data;
           this.loading = false;

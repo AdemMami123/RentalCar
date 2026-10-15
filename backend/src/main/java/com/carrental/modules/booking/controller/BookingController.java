@@ -53,6 +53,42 @@ public class BookingController {
     }
 
     /**
+     * Get bookings belonging to the authenticated customer.
+     *
+     * The customer identity is taken from the JWT subject rather than from a
+     * request parameter, preventing one customer from selecting another user's
+     * bookings through the client.
+     */
+    @GetMapping("/mine")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<List<BookingDTO>>> getMyBookings(Authentication authentication) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        bookingService.getBookingsByUser(authenticatedUserId(authentication)),
+                        "Bookings retrieved successfully"
+                )
+        );
+    }
+
+    /**
+     * Get bookings with a status for the authenticated customer.
+     */
+    @GetMapping("/mine/status/{status}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<List<BookingDTO>>> getMyBookingsByStatus(
+            @PathVariable String status,
+            Authentication authentication) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        bookingService.getBookingsByUserAndStatus(
+                                authenticatedUserId(authentication), status
+                        ),
+                        "Bookings retrieved successfully"
+                )
+        );
+    }
+
+    /**
      * Get all bookings for a specific user
      */
     @GetMapping("/user/{userId}")
@@ -216,5 +252,17 @@ public class BookingController {
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         bookingService.deleteBooking(id);
         return ResponseEntity.ok(ApiResponse.success(null, "Booking deleted successfully"));
+    }
+
+    private Long authenticatedUserId(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("Authenticated user is required");
+        }
+
+        try {
+            return Long.valueOf(authentication.getName());
+        } catch (NumberFormatException exception) {
+            throw new IllegalStateException("Authenticated user identity is invalid", exception);
+        }
     }
 }

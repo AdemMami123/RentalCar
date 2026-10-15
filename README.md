@@ -161,9 +161,17 @@ http://localhost:8080/api
 ### Booking Endpoints
 - `GET /bookings` - List bookings
 - `GET /bookings/{id}` - Get booking details
+- `GET /bookings/mine` - List bookings for the authenticated customer
+- `GET /bookings/mine/status/{status}` - Filter the authenticated customer's bookings
 - `POST /bookings` - Create booking
 - `PUT /bookings/{id}` - Update booking
 - `DELETE /bookings/{id}` - Cancel booking
+
+Customer booking reads use the authenticated user's identity from the JWT; the
+frontend does not select a customer by ID. Admin booking management remains
+available only to users with the `ADMIN` role, while customer detail,
+update, and cancellation operations are restricted to bookings owned by that
+customer.
 
 ### User Endpoints
 - `POST /users/register` - User registration
