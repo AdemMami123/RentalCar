@@ -48,4 +48,16 @@ export class CarService {
       params: { status }
     });
   }
+
+  getFavorites(): Observable<ApiResponse<Car[]>> {
+    return this.http.get<ApiResponse<Car[]>>(`${this.apiUrl}/favorites`);
+  }
+
+  addFavorite(id: number): Observable<ApiResponse<void>> {
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/favorites/${id}`, null);
+  }
+
+  removeFavorite(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/favorites/${id}`);
+  }
 }

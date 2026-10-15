@@ -5,7 +5,7 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
-import { User } from '../models/user.model';
+import { IdentityDocument, User } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -48,6 +48,26 @@ export class AuthService {
         this.userSubject.next(response.data);
       })
     );
+  }
+
+  updateProfile(profile: User): Observable<ApiResponse<User>> {
+    return this.http.put<ApiResponse<User>>(`${environment.apiUrl}/profile`, profile).pipe(
+      tap(response => {
+        sessionStorage.setItem('rentalcar_user', JSON.stringify(response.data));
+        this.userSubject.next(response.data);
+      })
+    );
+  }
+
+  uploadIdentityDocument(type: 'DRIVERS_LICENSE' | 'IDENTIFICATION', document: File): Observable<ApiResponse<IdentityDocument>> {
+    const formData = new FormData();
+    formData.append('type', type);
+    formData.append('document', document, document.name);
+    return this.http.post<ApiResponse<IdentityDocument>>(`${environment.apiUrl}/profile/documents`, formData);
+  }
+
+  getIdentityDocuments(): Observable<ApiResponse<IdentityDocument[]>> {
+    return this.http.get<ApiResponse<IdentityDocument[]>>(`${environment.apiUrl}/profile/documents`);
   }
 
   logout(): void {

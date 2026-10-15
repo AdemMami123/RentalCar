@@ -49,6 +49,29 @@ public class UserService {
     }
 
     @Transactional
+    public UserDTO updateOwnProfile(Long id, UserDTO dto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (dto.getEmail() == null || dto.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        String email = dto.getEmail().trim().toLowerCase(java.util.Locale.ROOT);
+        if (!user.getEmail().equals(email) && userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Email is already registered");
+        }
+        user.setEmail(email);
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setPhone(dto.getPhone());
+        user.setLicenseNumber(dto.getLicenseNumber());
+        user.setLicenseExpiry(dto.getLicenseExpiry());
+        user.setAddress(dto.getAddress());
+        user.setCity(dto.getCity());
+        user.setCountry(dto.getCountry());
+        return userMapper.toDTO(userRepository.save(user));
+    }
+
+    @Transactional
     public void deleteUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         userRepository.delete(user);

@@ -29,9 +29,10 @@ public class CloudinaryMediaService {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("An image file is required");
         }
-        if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
+        if (file.getContentType() == null || !java.util.Set.of("image/jpeg", "image/png", "image/webp").contains(file.getContentType().toLowerCase())) {
             throw new IllegalArgumentException("Only image files are allowed");
         }
+
         if (file.getSize() > 10 * 1024 * 1024) {
             throw new IllegalArgumentException("Images must be 10 MB or smaller");
         }
@@ -53,6 +54,26 @@ public class CloudinaryMediaService {
                     "Cloudinary rejected the image upload. Check that the API key has upload/create permission.",
                     exception
             );
+        }
+    }
+
+    public UploadedMedia uploadPrivateDocument(MultipartFile file, String folder) {
+        if (cloudName.isBlank() || apiKey.isBlank() || apiSecret.isBlank()) {
+            throw new IllegalStateException("Cloudinary is not configured");
+        }
+        try {
+            Map<?, ?> result = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", folder,
+                            "resource_type", "auto",
+                            "type", "authenticated",
+                            "access_mode", "authenticated"
+                    )
+            );
+            return new UploadedMedia(null, String.valueOf(result.get("public_id")));
+        } catch (IOException | RuntimeException exception) {
+            throw new MediaUploadException("The identity document could not be stored securely.", exception);
         }
     }
 

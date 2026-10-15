@@ -21,6 +21,8 @@
     <section class="car-header">
       <h1>{{ car.make }} {{ car.model }}</h1>
       <p class="year">{{ car.year }}</p>
+      <button type="button" (click)="toggleFavorite()">{{ favorite ? 'Remove from favorites' : 'Save to favorites' }}</button>
+      <p *ngIf="favoriteError" class="alert alert-danger">{{ favoriteError }}</p>
     </section>
 
     <div class="details-grid">

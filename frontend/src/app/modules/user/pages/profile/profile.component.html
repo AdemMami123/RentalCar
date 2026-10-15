@@ -1,5 +1,81 @@
 <main class="profile-page" *ngIf="user$ | async as user">
-  <section class="profile-hero"><p class="eyebrow">Your account</p><h1>Profile</h1><p>Keep your rental details close and your next journey even closer.</p></section>
-  <section class="profile-card"><div class="large-avatar"><img *ngIf="user.profileImageUrl" [src]="user.profileImageUrl" alt="Profile photo"><span *ngIf="!user.profileImageUrl">{{ (user.firstName || user.email).charAt(0).toUpperCase() }}</span></div><div><p class="label">Member</p><h2>{{ user.firstName }} {{ user.lastName }}</h2><p>{{ user.email }}</p><label class="text-button">{{ uploading ? 'Uploading...' : 'Upload profile photo' }}<input type="file" accept="image/*" (change)="onProfileImageSelected($event)" hidden></label><p *ngIf="error" class="error">{{ error }}</p></div></section>
-  <section class="details-grid"><article><span>First name</span><strong>{{ user.firstName || 'Not added' }}</strong></article><article><span>Last name</span><strong>{{ user.lastName || 'Not added' }}</strong></article><article><span>Account role</span><strong>{{ user.role || 'USER' }}</strong></article><article><span>Phone</span><strong>{{ user.phone || 'Not added' }}</strong></article></section>
+  <section class="profile-hero">
+    <div>
+      <p class="eyebrow">Your account</p>
+      <h1>Profile</h1>
+      <p>Manage your details, documents, and rental journey in one place.</p>
+    </div>
+  </section>
+
+  <section class="profile-layout">
+    <article class="profile-card profile-summary">
+      <div class="avatar-frame">
+        <div class="large-avatar">
+          <img *ngIf="user.profileImageUrl" [src]="user.profileImageUrl" alt="Profile photo">
+          <span *ngIf="!user.profileImageUrl">{{ (user.firstName || user.email).charAt(0).toUpperCase() }}</span>
+        </div>
+      </div>
+      <div class="summary-copy">
+        <p class="label">Member account</p>
+        <h2>{{ user.firstName || 'Welcome' }} {{ user.lastName }}</h2>
+        <p class="muted">{{ user.email }}</p>
+        <label class="text-button">
+          {{ uploading ? 'Uploading...' : 'Change profile photo' }}
+          <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onProfileImageSelected($event)" hidden>
+        </label>
+      </div>
+    </article>
+
+    <article class="profile-card form-card">
+      <div class="section-heading">
+        <div><p class="eyebrow">Your details</p><h2>Personal information</h2></div>
+        <span class="section-icon">01</span>
+      </div>
+      <p class="section-intro">Keep your contact and driving details up to date for a smoother pickup.</p>
+      <form (ngSubmit)="saveProfile()" #profileForm="ngForm">
+        <div class="form-grid">
+          <label>First name<input name="firstName" [(ngModel)]="profile.firstName" autocomplete="given-name" placeholder="Adem"></label>
+          <label>Last name<input name="lastName" [(ngModel)]="profile.lastName" autocomplete="family-name" placeholder="Mami"></label>
+          <label class="field-wide">Email address<input name="email" type="email" required email [(ngModel)]="profile.email" autocomplete="email" placeholder="you@example.com"></label>
+          <label>Phone number<input name="phone" [(ngModel)]="profile.phone" autocomplete="tel" placeholder="+1 555 000 0000"></label>
+          <label>Address<input name="address" [(ngModel)]="profile.address" autocomplete="street-address" placeholder="Street and number"></label>
+          <label>City<input name="city" [(ngModel)]="profile.city" autocomplete="address-level2" placeholder="City"></label>
+          <label>Country<input name="country" [(ngModel)]="profile.country" autocomplete="country-name" placeholder="Country"></label>
+          <label>Driver's license number<input name="licenseNumber" [(ngModel)]="profile.licenseNumber" placeholder="License number"></label>
+          <label>License expiry<input name="licenseExpiry" type="date" [(ngModel)]="profile.licenseExpiry"></label>
+        </div>
+        <div class="form-actions">
+          <p *ngIf="error" class="message error">{{ error }}</p>
+          <p *ngIf="saved" class="message success">Your information was saved.</p>
+          <button class="primary-button" type="submit" [disabled]="saving || profileForm.invalid">
+            {{ saving ? 'Saving...' : 'Save information' }}
+          </button>
+        </div>
+      </form>
+    </article>
+
+    <article class="profile-card documents-card">
+      <div class="section-heading">
+        <div><p class="eyebrow">Verification</p><h2>Identity documents</h2></div>
+        <span class="section-icon">02</span>
+      </div>
+      <p class="section-intro">Upload a clear PDF, JPG, or PNG. Your documents are stored privately.</p>
+      <div class="upload-actions">
+        <label class="upload-tile"><span class="upload-symbol">+</span><strong>Driver's license</strong><small>PDF, JPG or PNG</small><input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onDocumentSelected($event, 'DRIVERS_LICENSE')" hidden></label>
+        <label class="upload-tile"><span class="upload-symbol">+</span><strong>Identification</strong><small>PDF, JPG or PNG</small><input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onDocumentSelected($event, 'IDENTIFICATION')" hidden></label>
+      </div>
+      <ul class="document-list"><li *ngFor="let document of documents"><span>{{ document.documentType === 'DRIVERS_LICENSE' ? 'Driver’s license' : 'Identification' }}</span><small>{{ document.originalFilename }}</small></li></ul>
+    </article>
+
+    <article class="profile-card history-card">
+      <div class="section-heading"><div><p class="eyebrow">Your journeys</p><h2>Rental history</h2></div><span class="section-icon">03</span></div>
+      <p *ngIf="!bookings.length" class="empty-state">No rentals yet. Your completed and upcoming rentals will appear here.</p>
+      <div class="booking-list" *ngIf="bookings.length">
+        <div class="booking-row" *ngFor="let booking of bookings">
+          <div><strong>{{ booking.bookingNumber || 'Rental booking' }}</strong><span>{{ booking.pickupDate | date:'MMM d, y' }} — {{ booking.dropoffDate | date:'MMM d, y' }}</span></div>
+          <span class="status-pill">{{ booking.bookingStatus }}</span>
+        </div>
+      </div>
+    </article>
+  </section>
 </main>

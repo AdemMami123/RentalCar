@@ -95,8 +95,8 @@ server:
   compression:
     enabled: true
   error:
-    include-message: always
-    include-stacktrace: on_param
+    include-message: never
+    include-stacktrace: never
 
 # ============================================================
 # LOGGING CONFIGURATION

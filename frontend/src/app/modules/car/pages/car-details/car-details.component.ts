@@ -5,6 +5,7 @@ import { CarService } from '../../services/car.service';
 import { BookingFormComponent } from '../../../booking/components/booking-form/booking-form.component';
 import { Car } from '../../../../core/models/car.model';
 import { Booking } from '../../../../core/models/booking.model';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-car-details',
@@ -18,11 +19,14 @@ export class CarDetailsComponent implements OnInit {
   loading = true;
   error: string | null = null;
   bookingSuccessful = false;
+  favorite = false;
+  favoriteError = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private carService: CarService
+    private carService: CarService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -31,6 +35,19 @@ export class CarDetailsComponent implements OnInit {
       if (carId) {
         this.loadCarDetails(carId);
       }
+    });
+  }
+
+  toggleFavorite(): void {
+    if (!this.car || !this.authService.isAuthenticated()) {
+      this.favoriteError = 'Log in to save favorite vehicles.';
+      return;
+    }
+    const carId = this.car.id;
+    const request = this.favorite ? this.carService.removeFavorite(carId) : this.carService.addFavorite(carId);
+    request.subscribe({
+      next: () => this.favorite = !this.favorite,
+      error: error => this.favoriteError = error.error?.message || 'Unable to update favorites.'
     });
   }
 
