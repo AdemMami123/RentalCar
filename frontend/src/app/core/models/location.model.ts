@@ -9,4 +9,16 @@ export interface Location {
   country?: string;
   createdAt?: string;
   updatedAt?: string;
+  latitude?: number;
+  longitude?: number;
+  phone?: string;
+  email?: string;
+  openingTime?: string;
+  closingTime?: string;
+  locationType?: 'OFFICE' | 'AIRPORT' | 'OTHER';
+  pickupEnabled?: boolean;
+  returnEnabled?: boolean;
+  deliveryEnabled?: boolean;
+  active?: boolean;
+  timezone?: string;
 }

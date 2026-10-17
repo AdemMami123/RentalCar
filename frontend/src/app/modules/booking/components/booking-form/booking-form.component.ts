@@ -59,7 +59,7 @@ export class BookingFormComponent implements OnInit {
   private loadLocations(): void {
     this.locationService.getLocations().subscribe({
       next: (response) => {
-        this.locations = response.data;
+        this.locations = response.data.filter(location => location.active !== false);
       },
       error: () => {
         this.error = 'Unable to load pick-up and drop-off locations';
@@ -166,5 +166,9 @@ export class BookingFormComponent implements OnInit {
    */
   getMinDate(): string {
     return new Date().toISOString().split('T')[0];
+  }
+
+  getLocation(id: string | number | null): Location | undefined {
+    return this.locations.find(location => location.id === Number(id));
   }
 }

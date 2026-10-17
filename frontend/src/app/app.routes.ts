@@ -19,6 +19,11 @@ export const routes: Routes = [
       .then(m => m.CarListComponent)
   },
   {
+    path: 'locations',
+    loadComponent: () => import('./modules/location/pages/location-list/location-list.component')
+      .then(m => m.LocationListComponent)
+  },
+  {
     path: 'cars/:id',
     loadComponent: () => import('./modules/car/pages/car-details/car-details.component')
       .then(m => m.CarDetailsComponent)
@@ -74,6 +79,12 @@ export const routes: Routes = [
     canActivate: [authGuard, adminGuard],
     loadComponent: () => import('./modules/admin/pages/car-list/car-list.component')
       .then(m => m.CarListComponent)
+  },
+  {
+    path: 'admin/locations',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () => import('./modules/admin/pages/admin-locations/admin-locations.component')
+      .then(m => m.AdminLocationsComponent)
   },
   {
     path: '**',

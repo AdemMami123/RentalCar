@@ -97,4 +97,31 @@ public class Location extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private Integer availableCars = 0;
+
+    @Column(name = "location_type", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private LocationType locationType = LocationType.OFFICE;
+
+    @Column(name = "pickup_enabled", nullable = false)
+    @Builder.Default
+    private boolean pickupEnabled = true;
+
+    @Column(name = "return_enabled", nullable = false)
+    @Builder.Default
+    private boolean returnEnabled = true;
+
+    @Column(name = "delivery_enabled", nullable = false)
+    @Builder.Default
+    private boolean deliveryEnabled = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean active = true;
+
+    @Column(nullable = false, length = 80)
+    @Builder.Default
+    private String timezone = "UTC";
+
+    public enum LocationType { OFFICE, AIRPORT, OTHER }
 }

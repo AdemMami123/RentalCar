@@ -1,0 +1,34 @@
+<main class="locations-page">
+  <section class="locations-hero">
+    <p class="eyebrow">Pickup and return</p>
+    <h1>Find your rental location.</h1>
+    <p>Choose a convenient office, review its opening hours, and get directions before your journey begins.</p>
+  </section>
+  <div *ngIf="loading" class="state">Loading rental locations...</div>
+  <div *ngIf="error && !loading" class="state error">{{ error }}</div>
+  <section *ngIf="!loading && !error" class="location-browser">
+    <div class="location-list">
+      <label class="search-box"><span>Search offices</span><input [(ngModel)]="searchTerm" (input)="search()" placeholder="City, airport or office name"></label>
+      <p *ngIf="!filteredLocations.length" class="state">No locations match your search.</p>
+      <button type="button" class="location-card" *ngFor="let location of filteredLocations" [class.selected]="selectedLocation?.id === location.id" (click)="selectLocation(location)">
+        <span class="location-marker">⌖</span>
+        <span class="location-copy"><strong>{{ location.name }}</strong><small>{{ location.address }}, {{ location.city }}</small><em>{{ location.openingTime || '08:00' }} — {{ location.closingTime || '20:00' }}</em></span>
+        <span class="location-arrow">→</span>
+      </button>
+    </div>
+    <aside class="location-detail" *ngIf="selectedLocation">
+      <div class="map-placeholder">
+        <span class="map-pin">⌖</span>
+        <small>{{ selectedLocation.city }}</small>
+      </div>
+      <div class="detail-copy">
+        <p class="eyebrow">{{ selectedLocation.locationType || 'OFFICE' }}</p>
+        <h2>{{ selectedLocation.name }}</h2>
+        <p>{{ selectedLocation.address }}, {{ selectedLocation.city }}, {{ selectedLocation.country }}</p>
+        <dl><div><dt>Opening hours</dt><dd>{{ selectedLocation.openingTime || '08:00' }} — {{ selectedLocation.closingTime || '20:00' }}</dd></div><div><dt>Services</dt><dd>{{ selectedLocation.pickupEnabled ? 'Pickup' : '' }}{{ selectedLocation.returnEnabled ? ' · Return' : '' }}{{ selectedLocation.deliveryEnabled ? ' · Delivery' : '' }}</dd></div></dl>
+        <a class="directions-button" [href]="directions(selectedLocation)" target="_blank" rel="noopener">Get directions ↗</a>
+      </div>
+    </aside>
+  </section>
+  <a routerLink="/cars" class="back-link">Browse available vehicles →</a>
+</main>

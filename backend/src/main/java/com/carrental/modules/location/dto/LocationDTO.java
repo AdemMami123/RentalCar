@@ -8,6 +8,7 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import com.carrental.modules.location.entity.Location.LocationType;
 
 /**
  * Data Transfer Object for Location.
@@ -115,4 +116,10 @@ public class LocationDTO {
      * User who last updated the location
      */
     private String updatedBy;
+    private LocationType locationType;
+    private boolean pickupEnabled;
+    private boolean returnEnabled;
+    private boolean deliveryEnabled;
+    private boolean active;
+    private String timezone;
 }

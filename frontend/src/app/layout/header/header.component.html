@@ -4,22 +4,48 @@
   </a>
   <button class="menu-toggle" type="button" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen" [attr.aria-label]="'nav.toggle' | translate"><span></span><span></span><span></span></button>
   <nav class="navigation" [class.navigation-open]="menuOpen" aria-label="Main navigation">
-    <a routerLink="/cars" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">{{ 'nav.explore' | translate }}</a>
-    <a routerLink="/home" fragment="how-it-works" (click)="closeMenu()">{{ 'nav.howItWorks' | translate }}</a>
-    <ng-container *ngIf="user$ | async as user; else guestActions">
+    <ng-container *ngIf="user$ | async as user; else guestNavigation">
       <ng-container *ngIf="user.role === 'ADMIN'; else customerNavigation">
-        <span class="navigation-label">Admin</span>
-        <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">{{ 'nav.dashboard' | translate }}</a>
-        <a routerLink="/admin/cars" routerLinkActive="active" (click)="closeMenu()">{{ 'nav.manageCars' | translate }}</a>
-        <a routerLink="/admin/bookings" routerLinkActive="active" (click)="closeMenu()">{{ 'nav.manageBookings' | translate }}</a>
+        <div class="navigation-section admin-section">
+          <span class="navigation-label">Admin workspace</span>
+          <div class="navigation-links">
+            <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">{{ 'nav.dashboard' | translate }}</a>
+            <a routerLink="/admin/cars" routerLinkActive="active" (click)="closeMenu()">{{ 'nav.manageCars' | translate }}</a>
+            <a routerLink="/admin/locations" routerLinkActive="active" (click)="closeMenu()">Locations</a>
+            <a routerLink="/admin/bookings" routerLinkActive="active" (click)="closeMenu()">{{ 'nav.manageBookings' | translate }}</a>
+          </div>
+        </div>
       </ng-container>
       <ng-template #customerNavigation>
-        <a routerLink="/bookings" routerLinkActive="active" (click)="closeMenu()">{{ 'nav.myBookings' | translate }}</a>
+        <div class="navigation-section">
+          <span class="navigation-label">Explore</span>
+          <div class="navigation-links">
+            <a routerLink="/cars" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">{{ 'nav.explore' | translate }}</a>
+            <a routerLink="/locations" routerLinkActive="active" (click)="closeMenu()">Pickup locations</a>
+            <a routerLink="/home" fragment="how-it-works" (click)="closeMenu()">{{ 'nav.howItWorks' | translate }}</a>
+            <a routerLink="/bookings" routerLinkActive="active" (click)="closeMenu()">{{ 'nav.myBookings' | translate }}</a>
+          </div>
+        </div>
       </ng-template>
-      <a class="profile-link" routerLink="/profile" routerLinkActive="active" (click)="closeMenu()"><span class="avatar">{{ (user.firstName || user.email).charAt(0).toUpperCase() }}</span><span class="profile-copy"><small>{{ 'nav.signedInAs' | translate }} </small>{{ user.firstName || user.email }}</span></a>
-      <button class="logout-button" type="button" (click)="logout()">{{ 'nav.logout' | translate }}</button>
+      <div class="navigation-account">
+        <a class="profile-link" routerLink="/profile" routerLinkActive="active" (click)="closeMenu()"><span class="avatar">{{ (user.firstName || user.email).charAt(0).toUpperCase() }}</span><span class="profile-copy"><small>{{ 'nav.signedInAs' | translate }}</small>{{ user.firstName || user.email }}</span></a>
+        <button class="logout-button" type="button" (click)="logout()">{{ 'nav.logout' | translate }}</button>
+      </div>
     </ng-container>
-    <ng-template #guestActions><a class="login-link" routerLink="/login" (click)="closeMenu()">{{ 'nav.signIn' | translate }}</a><a class="join-button" routerLink="/register" (click)="closeMenu()">{{ 'nav.createAccount' | translate }}</a></ng-template>
+    <ng-template #guestNavigation>
+      <div class="navigation-section">
+        <span class="navigation-label">Discover</span>
+        <div class="navigation-links">
+          <a routerLink="/cars" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">{{ 'nav.explore' | translate }}</a>
+          <a routerLink="/locations" routerLinkActive="active" (click)="closeMenu()">Pickup locations</a>
+          <a routerLink="/home" fragment="how-it-works" (click)="closeMenu()">{{ 'nav.howItWorks' | translate }}</a>
+        </div>
+      </div>
+      <div class="guest-actions">
+        <a class="login-link" routerLink="/login" (click)="closeMenu()">{{ 'nav.signIn' | translate }}</a>
+        <a class="join-button" routerLink="/register" (click)="closeMenu()">{{ 'nav.createAccount' | translate }}</a>
+      </div>
+    </ng-template>
     <label class="language-picker"><span>{{ 'language.label' | translate }}</span><select [value]="languageService.language" (change)="changeLanguage($any($event.target).value)" [attr.aria-label]="'language.label' | translate"><option *ngFor="let language of languages" [value]="language">{{ ('language.' + language) | translate }}</option></select></label>
   </nav>
 </header>

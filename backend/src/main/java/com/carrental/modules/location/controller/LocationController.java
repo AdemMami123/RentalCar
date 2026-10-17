@@ -44,6 +44,12 @@ public class LocationController {
         );
     }
 
+    @GetMapping("/active")
+    public ResponseEntity<ApiResponse<List<LocationDTO>>> getActiveLocations() {
+        return ResponseEntity.ok(ApiResponse.success(locationService.getActiveLocations(),
+                "Active rental locations retrieved successfully"));
+    }
+
     /**
      * Get a location by ID
      * 

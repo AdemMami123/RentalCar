@@ -1,0 +1,26 @@
+<main class="locations-admin">
+  <section class="page-heading"><div><p class="eyebrow">Operations</p><h1>Rental locations</h1><p>Manage offices, opening details, and the services available at each branch.</p></div><button class="primary-button" type="button" (click)="startCreate()">Add location</button></section>
+  <div *ngIf="error" class="message error">{{ error }}</div><div *ngIf="success" class="message success">{{ success }}</div>
+  <div *ngIf="loading" class="panel">Loading locations...</div>
+  <section *ngIf="!loading" class="location-table panel">
+    <div class="location-row header"><span>Location</span><span>Services</span><span>Hours</span><span>Status</span><span>Actions</span></div>
+    <div *ngFor="let location of locations" class="location-row">
+      <div><strong>{{ location.name }}</strong><small>{{ location.address }}, {{ location.city }}</small></div>
+      <span>{{ location.pickupEnabled ? 'Pickup' : '' }}{{ location.returnEnabled ? ' · Return' : '' }}{{ location.deliveryEnabled ? ' · Delivery' : '' }}</span>
+      <span>{{ location.openingTime || '08:00' }} — {{ location.closingTime || '20:00' }}</span>
+      <span [class.active]="location.active !== false">{{ location.active === false ? 'Inactive' : 'Active' }}</span>
+      <div class="actions"><button type="button" (click)="startEdit(location)">Edit</button><button type="button" (click)="remove(location)">Delete</button></div>
+    </div>
+    <p *ngIf="!locations.length" class="empty">No rental locations configured.</p>
+  </section>
+  <section *ngIf="editing" class="editor panel">
+    <h2>{{ editing.id ? 'Edit location' : 'Add location' }}</h2>
+    <div class="form-grid">
+      <label>Name<input [(ngModel)]="editing.name"></label><label>Type<select [(ngModel)]="editing.locationType"><option value="OFFICE">Office</option><option value="AIRPORT">Airport</option><option value="OTHER">Other</option></select></label>
+      <label class="wide">Address<input [(ngModel)]="editing.address"></label><label>City<input [(ngModel)]="editing.city"></label><label>Country<input [(ngModel)]="editing.country"></label>
+      <label>Opening time<input type="time" [(ngModel)]="editing.openingTime"></label><label>Closing time<input type="time" [(ngModel)]="editing.closingTime"></label><label>Timezone<input [(ngModel)]="editing.timezone"></label>
+    </div>
+    <div class="checks"><label><input type="checkbox" [(ngModel)]="editing.pickupEnabled"> Pickup</label><label><input type="checkbox" [(ngModel)]="editing.returnEnabled"> Return</label><label><input type="checkbox" [(ngModel)]="editing.deliveryEnabled"> Delivery</label><label><input type="checkbox" [(ngModel)]="editing.active"> Active</label></div>
+    <div class="editor-actions"><button class="secondary-button" type="button" (click)="cancel()">Cancel</button><button class="primary-button" type="button" (click)="save()" [disabled]="saving">{{ saving ? 'Saving...' : 'Save location' }}</button></div>
+  </section>
+</main>

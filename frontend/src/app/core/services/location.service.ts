@@ -16,4 +16,20 @@ export class LocationService {
   getLocations(): Observable<ApiResponse<Location[]>> {
     return this.http.get<ApiResponse<Location[]>>(this.apiUrl);
   }
+
+  getActiveLocations(): Observable<ApiResponse<Location[]>> {
+    return this.http.get<ApiResponse<Location[]>>(`${this.apiUrl}/active`);
+  }
+
+  createLocation(location: Location): Observable<ApiResponse<Location>> {
+    return this.http.post<ApiResponse<Location>>(this.apiUrl, location);
+  }
+
+  updateLocation(id: number, location: Location): Observable<ApiResponse<Location>> {
+    return this.http.put<ApiResponse<Location>>(`${this.apiUrl}/${id}`, location);
+  }
+
+  deleteLocation(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
+  }
 }

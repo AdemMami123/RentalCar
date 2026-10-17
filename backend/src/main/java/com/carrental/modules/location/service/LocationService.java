@@ -43,6 +43,11 @@ public class LocationService {
                 .collect(Collectors.toList());
     }
 
+    public List<LocationDTO> getActiveLocations() {
+        return locationRepository.findByActiveTrueOrderByNameAsc().stream()
+                .map(locationMapper::toDTO).toList();
+    }
+
     /**
      * Get a location by ID
      * 

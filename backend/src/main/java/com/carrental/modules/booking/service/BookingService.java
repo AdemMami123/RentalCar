@@ -7,6 +7,10 @@ import com.carrental.modules.booking.exception.CarNotAvailableException;
 import com.carrental.modules.booking.exception.InvalidBookingStatusTransitionException;
 import com.carrental.modules.booking.mapper.BookingMapper;
 import com.carrental.modules.booking.repository.BookingRepository;
+import com.carrental.modules.booking.entity.BookingLocation;
+import com.carrental.modules.booking.repository.BookingLocationRepository;
+import com.carrental.modules.location.entity.Location;
+import com.carrental.modules.location.repository.LocationRepository;
 import com.carrental.modules.car.entity.Car;
 import com.carrental.modules.car.repository.CarRepository;
 import com.carrental.modules.user.entity.User;
@@ -37,6 +41,8 @@ public class BookingService {
     private final BookingMapper bookingMapper;
     private final CarRepository carRepository;
     private final UserRepository userRepository;
+    private final BookingLocationRepository bookingLocationRepository;
+    private final LocationRepository locationRepository;
 
     /**
      * Get all bookings (admin only)
@@ -207,9 +213,37 @@ public class BookingService {
 
         Booking booking = bookingMapper.toEntity(dto);
         Booking savedBooking = bookingRepository.save(booking);
+        saveOfficeLocationSnapshots(savedBooking, dto);
 
         log.info("Booking created successfully with ID: {}", savedBooking.getId());
         return toDTOWithCustomer(savedBooking);
+    }
+
+    private void saveOfficeLocationSnapshots(Booking booking, BookingDTO dto) {
+        Location pickup = locationRepository.findById(dto.getPickupLocationId())
+                .orElseThrow(() -> new ResourceNotFoundException("Pickup location not found"));
+        Location dropoff = locationRepository.findById(dto.getDropoffLocationId())
+                .orElseThrow(() -> new ResourceNotFoundException("Return location not found"));
+        saveLocationSnapshot(booking, BookingLocation.LocationType.PICKUP, pickup, booking.getPickupDate());
+        saveLocationSnapshot(booking, BookingLocation.LocationType.RETURN, dropoff, booking.getDropoffDate());
+    }
+
+    private void saveLocationSnapshot(Booking booking, BookingLocation.LocationType type,
+                                      Location location, LocalDateTime scheduledAt) {
+        boolean enabled = type == BookingLocation.LocationType.PICKUP
+                ? location.isPickupEnabled() : location.isReturnEnabled();
+        if (!location.isActive() || !enabled) {
+            throw new IllegalArgumentException("Selected " + type.name().toLowerCase() + " location is not available");
+        }
+        BookingLocation snapshot = BookingLocation.builder()
+                .bookingId(booking.getId()).locationType(type)
+                .fulfillmentType(BookingLocation.FulfillmentType.OFFICE_PICKUP)
+                .rentalLocationId(location.getId())
+                .address(location.getName() + ", " + location.getAddress() + ", " + location.getCity())
+                .latitude(location.getLatitude()).longitude(location.getLongitude())
+                .scheduledAt(scheduledAt).timezone(location.getTimezone())
+                .deliveryFee(BigDecimal.ZERO).build();
+        bookingLocationRepository.save(snapshot);
     }
 
     /**

@@ -79,4 +79,5 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
      * @return true if location exists, false otherwise
      */
     boolean existsByName(String name);
+    List<Location> findByActiveTrueOrderByNameAsc();
 }

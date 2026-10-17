@@ -49,7 +49,7 @@
       >
         <option value="">{{ 'booking.selectPickup' | translate }}</option>
         <option *ngFor="let location of locations" [value]="location.id">
-          {{ location.name }}
+          {{ location.name }} — {{ location.city }}
         </option>
       </select>
       <div *ngIf="bookingForm.get('pickupLocationId')?.hasError('required')" class="error-message">
@@ -73,6 +73,12 @@
       <div *ngIf="bookingForm.get('dropoffLocationId')?.hasError('required')" class="error-message">
         {{ 'booking.required' | translate }}
       </div>
+    </div>
+
+    <div *ngIf="bookingForm.get('pickupLocationId')?.value && getLocation(bookingForm.get('pickupLocationId')?.value)" class="location-hint">
+      <span>Pickup office</span>
+      <strong>{{ getLocation(bookingForm.get('pickupLocationId')?.value)?.address }}</strong>
+      <a [href]="'https://www.google.com/maps/search/?api=1&query=' + (getLocation(bookingForm.get('pickupLocationId')?.value)?.address || '')" target="_blank" rel="noopener">Get directions</a>
     </div>
 
     <div class="form-group">
