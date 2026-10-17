@@ -1,1 +1,99 @@
-<main class="admin-page"><p class="eyebrow">Operations</p><h1>Admin dashboard.</h1><p>Manage the fleet, locations, bookings, and customer activity from one place.</p><section class="admin-grid"><a routerLink="/admin/cars"><span>Fleet</span><strong>Manage cars</strong></a><a routerLink="/admin/bookings"><span>Bookings</span><strong>Review reservations</strong></a><article><span>Locations</span><strong>Update branches</strong></article></section></main>
+<main class="admin-page">
+  <section class="dashboard-hero">
+    <div>
+      <p class="eyebrow">Rental operations</p>
+      <h1>Good morning, admin.</h1>
+      <p class="hero-copy">A clear view of your fleet, reservations, and the work that needs attention today.</p>
+    </div>
+    <div class="hero-actions">
+      <a routerLink="/admin/bookings" class="primary-button">Manage bookings <span>↗</span></a>
+      <a routerLink="/admin/cars" class="secondary-button">Manage fleet</a>
+    </div>
+  </section>
+
+  <div *ngIf="loading" class="state-card">Loading your operations overview...</div>
+  <div *ngIf="error && !loading" class="state-card error-state">{{ error }}</div>
+
+  <ng-container *ngIf="!loading && !error">
+    <section class="metric-grid" aria-label="Business overview">
+      <article class="metric-card metric-primary">
+        <div class="metric-top"><span>Revenue collected</span><span class="metric-icon">€</span></div>
+        <strong>€{{ revenue | number:'1.0-0' }}</strong>
+        <small>From completed rentals</small>
+      </article>
+      <article class="metric-card">
+        <div class="metric-top"><span>Active rentals</span><span class="metric-icon">↗</span></div>
+        <strong>{{ activeRentals }}</strong>
+        <small>Vehicles currently on the road</small>
+      </article>
+      <article class="metric-card">
+        <div class="metric-top"><span>Available fleet</span><span class="metric-icon">⌁</span></div>
+        <strong>{{ availableCars }}<em>/ {{ cars.length }}</em></strong>
+        <small>{{ utilization }}% fleet utilization</small>
+      </article>
+      <article class="metric-card metric-alert">
+        <div class="metric-top"><span>Needs review</span><span class="metric-icon">!</span></div>
+        <strong>{{ pendingBookings }}</strong>
+        <small>Pending booking requests</small>
+      </article>
+    </section>
+
+    <section class="workspace-grid">
+      <article class="panel attention-panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">Today's focus</p><h2>Attention required</h2></div>
+          <a routerLink="/admin/bookings">View all</a>
+        </div>
+        <div *ngIf="!attentionBookings.length" class="empty-state">Everything is up to date. No active items need attention.</div>
+        <div *ngFor="let booking of attentionBookings" class="attention-row">
+          <div class="booking-mark">{{ (booking.bookingNumber || 'BK').slice(-2) }}</div>
+          <div class="row-copy">
+            <strong>{{ booking.bookingNumber || 'Rental booking' }}</strong>
+            <span>{{ booking.bookingStatus === 'PENDING' ? 'Awaiting confirmation' : 'Active rental' }} · {{ formatDate(booking.pickupDate) }}</span>
+          </div>
+          <span [class]="'status-pill ' + getStatusClass(booking.bookingStatus)">{{ booking.bookingStatus }}</span>
+        </div>
+      </article>
+
+      <article class="panel fleet-panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">Fleet pulse</p><h2>Vehicle availability</h2></div>
+          <a routerLink="/admin/cars">Manage</a>
+        </div>
+        <div class="fleet-ring" [style.--utilization]="utilization + '%'">
+          <div><strong>{{ utilization }}%</strong><span>in use</span></div>
+        </div>
+        <div class="fleet-legend">
+          <span><i class="available-dot"></i>Available <strong>{{ availableCars }}</strong></span>
+          <span><i class="rented-dot"></i>Rented <strong>{{ rentedCars }}</strong></span>
+          <span><i class="maintenance-dot"></i>Maintenance <strong>{{ maintenanceCars }}</strong></span>
+        </div>
+      </article>
+    </section>
+
+    <section class="lower-grid">
+      <article class="panel recent-panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">Latest activity</p><h2>Recent bookings</h2></div>
+          <a routerLink="/admin/bookings">Open bookings</a>
+        </div>
+        <div *ngIf="!recentBookings.length" class="empty-state">No bookings have been created yet.</div>
+        <div *ngFor="let booking of recentBookings" class="recent-row">
+          <div class="customer-avatar">{{ (booking.customer?.firstName || 'C').charAt(0).toUpperCase() }}</div>
+          <div class="row-copy">
+            <strong>{{ booking.customer?.firstName || 'Customer' }} {{ booking.customer?.lastName || '' }}</strong>
+            <span>{{ booking.bookingNumber }} · {{ formatDate(booking.createdAt) }}</span>
+          </div>
+          <div class="recent-total"><strong>€{{ booking.totalCost || 0 }}</strong><span [class]="'status-text ' + getStatusClass(booking.bookingStatus)">{{ booking.bookingStatus }}</span></div>
+        </div>
+      </article>
+
+      <article class="panel tools-panel">
+        <div class="panel-heading"><div><p class="eyebrow">Shortcuts</p><h2>Quick actions</h2></div></div>
+        <a routerLink="/admin/cars" class="tool-link"><span class="tool-icon">+</span><span><strong>Add a vehicle</strong><small>Grow or update the fleet</small></span><b>→</b></a>
+        <a routerLink="/admin/bookings" class="tool-link"><span class="tool-icon">✓</span><span><strong>Review reservations</strong><small>{{ confirmedBookings }} confirmed · {{ pendingBookings }} pending</small></span><b>→</b></a>
+        <a routerLink="/admin/bookings" class="tool-link"><span class="tool-icon">⌁</span><span><strong>Complete inspections</strong><small>{{ activeRentals }} active rental{{ activeRentals === 1 ? '' : 's' }}</small></span><b>→</b></a>
+      </article>
+    </section>
+  </ng-container>
+</main>

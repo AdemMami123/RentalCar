@@ -16,6 +16,15 @@ export class LoginComponent {
 	submit(): void {
 		if (this.form.invalid) return;
 		this.submitting = true; this.error = '';
-		this.authService.login(this.form.getRawValue()).subscribe({ next: () => void this.router.navigate(['/home']), error: () => { this.error = 'Invalid email or password.'; this.submitting = false; } });
+		this.authService.login(this.form.getRawValue()).subscribe({
+			next: response => {
+				const destination = response.data.user.role === 'ADMIN' ? '/admin' : '/home';
+				void this.router.navigate([destination]);
+			},
+			error: () => {
+				this.error = 'Invalid email or password.';
+				this.submitting = false;
+			}
+		});
 	}
 }
