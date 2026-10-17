@@ -1,17 +1,21 @@
 import { AsyncPipe, DatePipe, DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AuthService } from '../../../../core/services/auth.service';
 import { Booking } from '../../../../core/models/booking.model';
 import { IdentityDocument, User } from '../../../../core/models/user.model';
 import { BookingService } from '../../../booking/services/booking.service';
+import { CarService } from '../../../car/services/car.service';
+import { Car } from '../../../../core/models/car.model';
 
-@Component({ selector: 'app-profile', standalone: true, imports: [AsyncPipe, DatePipe, DecimalPipe, NgIf, NgFor, FormsModule], templateUrl: './profile.component.html', styleUrl: './profile.component.scss' })
+@Component({ selector: 'app-profile', standalone: true, imports: [AsyncPipe, DatePipe, DecimalPipe, NgIf, NgFor, FormsModule, RouterLink], templateUrl: './profile.component.html', styleUrl: './profile.component.scss' })
 export class ProfileComponent implements OnInit {
   readonly user$ = this.authService.user$;
   profile: Partial<User> = {};
   bookings: Booking[] = [];
+  favoriteCars: Car[] = [];
   documents: IdentityDocument[] = [];
   uploading = false;
   saving = false;
@@ -30,12 +34,17 @@ export class ProfileComponent implements OnInit {
   constructor(
     private readonly authService: AuthService,
     private readonly bookingService: BookingService,
+    private readonly carService: CarService,
     private readonly sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
     this.authService.user$.subscribe(user => { if (user) this.profile = { ...user }; });
     this.bookingService.getMyBookings().subscribe(response => this.bookings = response.data);
+    this.carService.getFavorites().subscribe({
+      next: response => this.favoriteCars = response.data,
+      error: error => this.error = error.error?.message || 'Unable to load favorite vehicles.'
+    });
     this.authService.getIdentityDocuments().subscribe(response => this.documents = response.data);
   }
 
@@ -128,5 +137,12 @@ export class ProfileComponent implements OnInit {
     this.viewingDocumentId = null;
     this.viewingDocumentUrl = '';
     this.viewingDocumentSafeUrl = null;
+  }
+
+  removeFavorite(car: Car): void {
+    this.carService.removeFavorite(car.id).subscribe({
+      next: () => this.favoriteCars = this.favoriteCars.filter(item => item.id !== car.id),
+      error: error => this.error = error.error?.message || 'Unable to remove favorite vehicle.'
+    });
   }
 }

@@ -1,0 +1,53 @@
+<main class="inspection-page">
+  <a routerLink="/bookings" class="back-link">← Back to bookings</a>
+  <p *ngIf="loading">Loading booking...</p>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+  <section *ngIf="booking && !loading">
+    <h1>{{ readOnly ? 'Completed return inspection' : 'Vehicle inspection' }}</h1>
+    <p>Booking <strong>{{ booking.bookingNumber }}</strong> · Vehicle #{{ booking.carId }}</p>
+    <p *ngIf="readOnly" class="completed-note">This inspection is complete and historically traceable. The evidence below is read-only.</p>
+    <form *ngIf="!readOnly" [formGroup]="form" (ngSubmit)="submit()">
+      <label>Inspection stage
+        <select formControlName="inspectionType">
+          <option value="PICKUP">Pickup</option>
+          <option value="RETURN">Return</option>
+        </select>
+      </label>
+      <div class="grid">
+        <label>Odometer <input type="number" formControlName="odometerReading"></label>
+        <label>Fuel level (%) <input type="number" formControlName="fuelLevel"></label>
+        <label>Exterior
+          <select formControlName="exteriorCondition"><option>GOOD</option><option>FAIR</option><option>POOR</option></select>
+        </label>
+        <label>Interior
+          <select formControlName="interiorCondition"><option>GOOD</option><option>FAIR</option><option>POOR</option></select>
+        </label>
+      </div>
+      <div formArrayName="damages">
+        <h2>Damage evidence</h2>
+        <div *ngFor="let damage of damages.controls; let i = index" [formGroupName]="i" class="damage">
+          <input formControlName="damageType" placeholder="Damage type">
+          <input formControlName="locationOnVehicle" placeholder="Location">
+          <input formControlName="description" placeholder="Description">
+          <select formControlName="severity"><option>MINOR</option><option>MODERATE</option><option>SEVERE</option></select>
+          <button type="button" (click)="removeDamage(i)">Remove</button>
+        </div>
+        <button type="button" (click)="addDamage()">Add damage</button>
+      </div>
+      <label>Notes <textarea formControlName="notes"></textarea></label>
+      <label>Photos <input type="file" accept="image/jpeg,image/png,image/webp" multiple (change)="selectFiles($event)"></label>
+      <button type="submit" [disabled]="saving || form.invalid">{{ saving ? 'Saving...' : 'Complete inspection' }}</button>
+    </form>
+  </section>
+
+  <section *ngIf="comparison" class="comparison">
+    <h2>Pickup and return comparison</h2>
+    <p>Distance driven: {{ comparison.distanceDriven }} · Fuel change: {{ comparison.fuelDifference }}%</p>
+    <p *ngIf="comparison.hasDiscrepancies" class="warning">Potential differences require human review.</p>
+    <h3>Potential new damage</h3>
+    <p *ngIf="!comparison.potentialNewDamage.length">No potential new damage identified.</p>
+    <ul><li *ngFor="let damage of comparison.potentialNewDamage">{{ damage.locationOnVehicle }}: {{ damage.description }}</li></ul>
+  </section>
+</main>

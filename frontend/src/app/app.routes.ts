@@ -36,6 +36,12 @@ export const routes: Routes = [
       .then(m => m.BookingDetailsComponent)
   },
   {
+    path: 'admin/bookings/:id/inspection',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () => import('./modules/booking/pages/inspection/inspection.component')
+      .then(m => m.InspectionComponent)
+  },
+  {
     path: 'login',
     loadComponent: () => import('./modules/user/pages/login/login.component')
       .then(m => m.LoginComponent)

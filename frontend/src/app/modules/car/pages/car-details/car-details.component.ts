@@ -59,6 +59,12 @@ export class CarDetailsComponent implements OnInit {
     this.carService.getCarById(carId).subscribe({
       next: (response) => {
         this.car = response.data;
+        if (this.authService.isAuthenticated()) {
+          this.carService.getFavorites().subscribe({
+            next: favorites => this.favorite = favorites.data.some(car => car.id === this.car?.id),
+            error: () => this.favoriteError = 'Unable to load favorite status.'
+          });
+        }
         this.loading = false;
       },
       error: (err) => {

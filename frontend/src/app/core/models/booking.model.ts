@@ -14,6 +14,7 @@ export interface Booking {
   totalCost?: number;
   bookingStatus?: string; // PENDING, CONFIRMED, ACTIVE, COMPLETED, CANCELLED
   notes?: string;
+  carDetails?: import('./car.model').Car;
   createdAt?: string;
   updatedAt?: string;
 }

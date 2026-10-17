@@ -90,6 +90,25 @@
         </div>
       </div>
     </article>
+
+    <article class="profile-card favorites-card">
+      <div class="section-heading"><div><p class="eyebrow">Your shortlist</p><h2>Favorite vehicles</h2></div><span class="section-icon">04</span></div>
+      <p *ngIf="!favoriteCars.length" class="empty-state">You have not saved any vehicles yet. Explore the fleet and tap the favorite button to keep one here.</p>
+      <div class="favorite-grid" *ngIf="favoriteCars.length">
+        <article class="favorite-vehicle" *ngFor="let car of favoriteCars">
+          <img *ngIf="car.imageUrls?.length" [src]="car.imageUrls?.[0]" [alt]="car.make + ' ' + car.model">
+          <div class="favorite-vehicle-copy">
+            <h3>{{ car.make }} {{ car.model }}</h3>
+            <p>{{ car.year }} · {{ car.carType }}</p>
+            <strong>€{{ car.dailyRate }}/day</strong>
+            <div class="favorite-actions">
+              <a class="primary-button" [routerLink]="['/cars', car.id]">View vehicle</a>
+              <button class="secondary-button" type="button" (click)="removeFavorite(car)">Remove</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </article>
   </section>
 
   <div class="document-modal-backdrop" *ngIf="selectedDocument">
